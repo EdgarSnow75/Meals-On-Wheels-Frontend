@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 import "./App.css";
 import Header from "./components/generic/Header";
 import WebFont from "webfontloader";
+import Footer from "./components/generic/Footer";
+import Home from "./components/mainContents/Home";
+import PathError from "./components/misc/PathError";
 
 const App = () => {
   useEffect(() => {
@@ -11,8 +19,16 @@ const App = () => {
 
   return (
     <div className="App" data-theme="violetta">
-      <Header />
-      <div className="px-2"></div>
+      <Router>
+        <Header />
+        <div className="px-2 py-4">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<PathError />} />
+          </Routes>
+        </div>
+        <Footer />
+      </Router>
     </div>
   );
 };
