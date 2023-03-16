@@ -2,7 +2,7 @@ import MainLogo from "images/Logo.png";
 
 const Footer = () => {
   return (
-    <footer className="footer flex flex-col flex-nowrap justify-cente align-middle items-center p-10 bg-primary text-primary-content">
+    <footer className="footer flex flex-col flex-nowrap justify-cente align-middle items-center p-5 bg-primary text-primary-content gap-y-0">
       <div className="footer-center">
         <img src={MainLogo} className="w-32 rounded-md mb-2" />
         <p className="font-bold text-3xl">Meals On Wheels</p>

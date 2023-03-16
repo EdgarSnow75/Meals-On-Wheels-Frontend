@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const PathError = () => {
-  const navigate = useNavigateigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     navigate("/error", { replace: true });

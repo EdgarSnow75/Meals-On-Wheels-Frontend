@@ -1,9 +1,15 @@
 import DownArrow from "images/down-arrow.png";
 import MainLogo from "images/Logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const linkHandler = (path) => {
+    navigate(path);
+  };
   return (
-    <div className="navbar bg-base-100 shadow-lg rounded-md w-full font-sans">
+    <div className="navbar bg-base-100 shadow-xl rounded-md w-full font-sans sticky top-0 z-10">
       <div className="navbar-start ml-3">
         <div className="dropdown">
           <label tabIndex={0} className="btn btn-ghost lg:hidden">
@@ -102,13 +108,21 @@ const Header = () => {
       </div>
       <div className="navbar-end mr-6">
         <div className="mr-6">
-          <button className="btn btn-primary font-bold">Donate</button>
+          <button className="btn btn-primary font-bold pt-1">Donate</button>
         </div>
         <div className="">
-          <button className="btn btn-outline btn-secondary mr-2 font-bold">
+          <button
+            className="btn btn-outline btn-secondary mr-2 font-bold pt-1"
+            onClick={() => linkHandler("/userLogin")}
+          >
             Login
           </button>
-          <button className="btn btn-secondary font-bold">Sign Up</button>
+          <button
+            className="btn btn-secondary font-bold pt-1"
+            onClick={() => linkHandler("/userSignUp")}
+          >
+            Sign Up
+          </button>
         </div>
       </div>
     </div>
