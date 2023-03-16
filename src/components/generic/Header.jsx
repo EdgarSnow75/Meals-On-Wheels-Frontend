@@ -119,7 +119,7 @@ const Header = () => {
           </button>
           <button
             className="btn btn-secondary font-bold pt-1"
-            onClick={() => linkHandler("/userSignUp")}
+            onClick={() => linkHandler("/userRegister")}
           >
             Sign Up
           </button>
