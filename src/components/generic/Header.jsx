@@ -70,7 +70,7 @@ const Header = () => {
         </div>
         <div>
           <a className="btn btn-ghost normal-case text-xl">
-            <img src={MainLogo} alt="Logo" className="w-26 h-20 mr-2" />
+            <img src={MainLogo} alt="Logo" className="w-28 h-16 mr-2" />
             Meals On Wheels
           </a>
         </div>
