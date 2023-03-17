@@ -13,6 +13,8 @@ import Home from "./components/mainContents/Home";
 import PathError from "./components/misc/PathError";
 import UserLogin from "./components/user/UserLogin";
 import UserRegister from "./components/user/UserRegister";
+import Volunteer from "./components/volunteer/Volunteer";
+import AboutUs from "./components/about/AboutUs"
 
 const App = () => {
   useEffect(() => {
@@ -29,6 +31,8 @@ const App = () => {
             <Route path="*" element={<PathError />} />
             <Route path="/userRegister" element={<UserRegister />} />
             <Route path="/userLogin" element={<UserLogin />}></Route>
+            <Route path="/volunteer" element={<Volunteer />}></Route>
+            <Route path="/about" element={<AboutUs />}></Route>
           </Routes>
         </div>
         <Footer />
