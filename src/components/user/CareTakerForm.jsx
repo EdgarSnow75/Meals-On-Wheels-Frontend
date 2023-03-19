@@ -126,6 +126,18 @@ const CareTakerForm = () => {
               />
             </div>
             <div className="flex flex-col">
+              <label className="mr-4">Your Email Address</label>
+              <input
+                type="email"
+                name="emailAddress"
+                className="w-[30rem] input"
+                placeholder="Email"
+                value={caretaker.emailAddress}
+                onChange={inputChangeHandler}
+                required
+              />
+            </div>
+            <div className="flex flex-col">
               <label className="mr-4">Your Full Address</label>
               <input
                 type="text"

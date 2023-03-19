@@ -135,7 +135,7 @@ const MemberRegisterFrom = () => {
               name="userAddress"
               className="w-[30rem] input"
               placeholder="Address:"
-              value={member.fullAddress}
+              value={member.address}
               onChange={inputChangeHandler}
               required
             />

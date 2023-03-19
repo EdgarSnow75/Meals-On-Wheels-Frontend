@@ -240,7 +240,7 @@ const PartnerForm = () => {
             <label className="mr-4">Select your Service Type</label>
             <select
               name="serviceType"
-              className="w-[30rem] input text-black text-black"
+              className="w-[30rem] input text-black"
               value={partner.serviceType}
               onChange={inputChangeHandler}
               required

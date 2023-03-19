@@ -35,6 +35,14 @@ const UserLogin = () => {
                 Login
               </button>
             </div>
+            <div>
+              <a
+                onClick={() => handleLink("/forgetPassword")}
+                className="link link-primary ml-1"
+              >
+                Forgot your password?
+              </a>
+            </div>
           </form>
         </div>
       </div>
