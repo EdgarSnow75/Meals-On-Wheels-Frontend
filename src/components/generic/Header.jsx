@@ -69,7 +69,10 @@ const Header = () => {
           </ul>
         </div>
         <div>
-          <a className="btn btn-ghost normal-case text-xl">
+          <a
+            className="flex items-center cursor-pointer hover:text-primary normal-case text-xl"
+            onClick={() => linkHandler("/")}
+          >
             <img src={MainLogo} alt="Logo" className="w-28 h-16 mr-2" />
             Meals On Wheels
           </a>

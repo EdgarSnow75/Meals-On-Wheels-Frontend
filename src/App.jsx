@@ -13,6 +13,16 @@ import Home from "./components/mainContents/Home";
 import PathError from "./components/misc/PathError";
 import UserLogin from "./components/user/UserLogin";
 import UserRegister from "./components/user/UserRegister";
+import AdminDashBoard from "./components/admin/adminDashboard";
+import MemberCreateFrom from "./components/admin/forms/MemberCreateForm";
+import CareTakerForm from "./components/user/CareTakerForm";
+import CaretakerCreateForm from "./components/admin/forms/CaretakerCreateForm";
+import PartnerCreateForm from "./components/admin/forms/PartnerCreateForm";
+import VolunteerCreateForm from "./components/admin/forms/VolunteerCreateForm";
+import MemberProfile from "./components/user/profiles/MemberProfile";
+import CaretakerProfile from "./components/user/profiles/CaretakerProfile";
+import PartnerProfile from "./components/user/profiles/PartnerProfile";
+import VolunteerProfile from "./components/user/profiles/VolunteerProfile";
 
 const App = () => {
   useEffect(() => {
@@ -29,6 +39,33 @@ const App = () => {
             <Route path="*" element={<PathError />} />
             <Route path="/userRegister" element={<UserRegister />} />
             <Route path="/userLogin" element={<UserLogin />}></Route>
+            <Route path="/adminDashboard" element={<AdminDashBoard />}></Route>
+            <Route path="/memberProfile" element={<MemberProfile />}></Route>
+            <Route path="/partnerProfile" element={<PartnerProfile />}></Route>
+            <Route
+              path="/volunteerProfile"
+              element={<VolunteerProfile />}
+            ></Route>
+            <Route
+              path="/caretakerProfile"
+              element={<CaretakerProfile />}
+            ></Route>
+            <Route
+              path="/adminDashboard/memberCreate"
+              element={<MemberCreateFrom />}
+            ></Route>
+            <Route
+              path="/adminDashboard/caretakerCreate"
+              element={<CaretakerCreateForm />}
+            ></Route>
+            <Route
+              path="/adminDashboard/partnerCreate"
+              element={<PartnerCreateForm />}
+            ></Route>
+            <Route
+              path="/adminDashboard/volunteerCreate"
+              element={<VolunteerCreateForm />}
+            ></Route>
           </Routes>
         </div>
         <Footer />
