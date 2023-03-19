@@ -243,7 +243,7 @@ const VolunteerForm = () => {
             <label className="mr-4">Select your Service Type</label>
             <select
               name="serviceProvided"
-              className="w-[30rem] input text-black text-black"
+              className="w-[30rem] input text-black"
               value={volunteer.serviceProvided}
               onChange={inputChangeHandler}
               required

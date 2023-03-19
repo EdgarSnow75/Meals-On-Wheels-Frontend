@@ -20,13 +20,15 @@ const UserRegister = () => {
         <div className="flex flex-col">
           <label className="mb-2">Select how you want to sign up as</label>
           <select onChange={onChangeHandler}>
-            <option value="Member">Member</option>
+            <option value="" disabled></option>
+            <option value="Member" selected>
+              Member
+            </option>
             <option value="Caretaker">Caretaker</option>
             <option value="Partner">Partner</option>
             <option value="Volunteer">Volunteer</option>
           </select>
         </div>
-        {}
         {form === "Member" && <MemberRegisterFrom />}
         {form === "Caretaker" && <CareTakerForm />}
         {form === "Partner" && <PartnerForm />}

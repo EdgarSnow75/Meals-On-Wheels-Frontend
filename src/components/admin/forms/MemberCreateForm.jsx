@@ -1,16 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BackButton from "../../generic/BackButton";
 
-const CareTakerForm = () => {
-  const [caretaker, setCaretaker] = useState({
-    firstName: "",
-    lastName: "",
-    emailAddress: "",
-    address: "",
-    contactNumber: "",
-    relationshipToMember: "",
-    password: "",
-  });
+const MemberCreateFrom = () => {
   const [member, setMember] = useState({
     firstName: "",
     lastName: "",
@@ -65,17 +57,6 @@ const CareTakerForm = () => {
     }
   };
 
-  const inputCaretakerChangeHandler = (event) => {
-    const target = event.target;
-    const name = target.name;
-    const value = target.value;
-
-    setCaretaker({
-      ...caretaker,
-      [name]: value,
-    });
-  };
-
   const hiddenInputHandler = (event) => {
     if (event.target.checked) {
       setIsAllergic(true);
@@ -86,7 +67,7 @@ const CareTakerForm = () => {
 
   const submitHandler = () => {
     console.log("hi");
-    alert("You've been successfully registered as a caretaker");
+    alert("You've been successfully registered as a member!");
   };
 
   const handleLink = (path) => {
@@ -94,123 +75,18 @@ const CareTakerForm = () => {
   };
 
   return (
-    <div className="text-white">
-      <div className="rounded-md w-[35rem] shadow-md p-10 pt-2 my-4 ring-[0.5px] ring-[rgba(0,0,0,0.2) bg-accent">
-        <form onSubmit={submitHandler}>
-          <div className="mt-8 max-w-md grid grid-cols-1 gap-6">
-            <h2 className="font-bold text-xl text-primary pb-2 border-b-4 border-primary w-[30rem]">
-              Caretaker's Details
-            </h2>
+    <div>
+      <div className="text-white flex flex-col items-center">
+        <h2 className="font-bold text-4xl text-black my-4">
+          Create a new member user
+        </h2>
+        <div className="rounded-md w-[35rem] shadow-md p-10 pt-2 my-4 ring-[0.5px] ring-[rgba(0,0,0,0.2) bg-accent">
+          <form
+            onSubmit={submitHandler}
+            className="mt-8 max-w-md grid grid-cols-1 gap-6"
+          >
             <div className="flex flex-col">
-              <label className="mr-4">Your First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                className="w-[30rem] input"
-                placeholder="First Name"
-                value={caretaker.firstName}
-                onChange={inputCaretakerChangeHandler}
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="mr0-4">Your Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                className="w-[30rem] input"
-                placeholder="Last Name"
-                value={caretaker.lastName}
-                onChange={inputCaretakerChangeHandler}
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="mr-4">Your Email Address</label>
-              <input
-                type="email"
-                name="emailAddress"
-                className="w-[30rem] input"
-                placeholder="Email"
-                value={caretaker.emailAddress}
-                onChange={inputChangeHandler}
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="mr-4">Your Full Address</label>
-              <input
-                type="text"
-                name="userAddress"
-                className="w-[30rem] input"
-                placeholder="Address:"
-                value={caretaker.fullAddress}
-                onChange={inputCaretakerChangeHandler}
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="mr-4">Your Contact Number</label>
-              <input
-                type="text"
-                name="contactNumber"
-                className="w-[30rem] input"
-                placeholder="Contact"
-                value={caretaker.contactNumber}
-                onChange={inputCaretakerChangeHandler}
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="mr-4">
-                Your relationship with the dependent member
-              </label>
-              <select
-                name="relationshipToMember"
-                className="w-[30rem] input text-black"
-                value={caretaker.relationshipToMember}
-                onChange={inputCaretakerChangeHandler}
-                required
-              >
-                <option value="">Select Relationship</option>
-                <option value="Parent">Parent</option>
-                <option value="Guardian">Guardian</option>
-                <option value="Nurse">Nurse</option>
-                <option value="Relative">Relative</option>
-                <option value="Caregiver">Caregiver</option>
-              </select>
-            </div>
-            <div className="flex flex-col">
-              <label className="mr-4 mb-2">
-                Documents to support your relationship
-              </label>
-              <input
-                type="file"
-                name="file"
-                className="file:py-2 file:px-4 file:rounded-full file:border-0 file:text-md file:font-semibold
-              file:bg-primary file:text-white
-              hover:file:bg-primary-focus"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="mr-4">Yours Password</label>
-              <input
-                type="password"
-                name="userPassword"
-                className="w-[30rem] input"
-                placeholder="Password"
-                value={caretaker.password}
-                onChange={inputCaretakerChangeHandler}
-                required
-              />
-            </div>
-          </div>
-          <div className="mt-12 max-w-md grid grid-cols-1 gap-6">
-            <h2 className="font-bold text-xl text-primary pb-2 border-b-4 border-primary w-[30rem]">
-              Dependent Member's Details
-            </h2>
-            <div className="flex flex-col">
-              <label className="mr-4">Member's First Name</label>
+              <label className="mr-4">First Name</label>
               <input
                 type="text"
                 name="firstName"
@@ -222,7 +98,7 @@ const CareTakerForm = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr0-4">Member's Last Name</label>
+              <label className="mr0-4">Last Name</label>
               <input
                 type="text"
                 name="lastName"
@@ -234,7 +110,7 @@ const CareTakerForm = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr0-4">Member's Birthday</label>
+              <label className="mr0-4">Birthday</label>
               <input
                 type="date"
                 name="birthdate"
@@ -246,7 +122,7 @@ const CareTakerForm = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Member's Email Address</label>
+              <label className="mr-4">Email Address</label>
               <input
                 type="email"
                 name="emailAddress"
@@ -258,19 +134,19 @@ const CareTakerForm = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Member's Full Address</label>
+              <label className="mr-4">Full Address</label>
               <input
                 type="text"
                 name="userAddress"
                 className="w-[30rem] input"
                 placeholder="Address:"
-                value={member.fullAddress}
+                value={member.address}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Member's Contact Number</label>
+              <label className="mr-4">Contact Number</label>
               <input
                 type="text"
                 name="contactNumber"
@@ -282,7 +158,7 @@ const CareTakerForm = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Member's Dietary Restrictions</label>
+              <label className="mr-4">Dietary Restrictions</label>
               <div className="grid grid-cols-3 gap-6">
                 <label className="flex items-center">
                   <input
@@ -403,10 +279,10 @@ const CareTakerForm = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Member's Password</label>
+              <label className="mr-4">Password</label>
               <input
                 type="password"
-                name="userPassword"
+                name="password"
                 className="w-[30rem] input"
                 placeholder="Password"
                 value={member.password}
@@ -431,14 +307,15 @@ const CareTakerForm = () => {
               </label>
             </div>
             <div className="flex justify-center items-center">
+              <BackButton />
               <button type="submit" className="btn ml-10 w-40 btn-primary">
-                Sign Up
+                Create
               </button>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
 };
-export default CareTakerForm;
+export default MemberCreateFrom;
