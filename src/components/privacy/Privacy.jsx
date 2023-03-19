@@ -9,7 +9,7 @@ const Privacy = () => {
                 </div>
                 
             </div>
-            <div className=""> 
+            <div className="m-10"> 
                     <h3 className="text-2xl mt-10 mb-3  ">
                          PROTECTING AND MAINTAINING THE CONFIDENTIALITY OF PERSONAL INFORMATION
                     </h3>
