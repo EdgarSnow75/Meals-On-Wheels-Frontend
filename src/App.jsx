@@ -18,6 +18,7 @@ import AboutUs from "./components/about/AboutUs"
 import ContactUs from "./components/contactus/ContactUs";
 import Privacy from "./components/privacy/Privacy";
 import Donate from "./components/Donate/Donate";
+import PaymentDetails from "./components/paymentDetails/PaymentDetails";
 
 const App = () => {
   useEffect(() => {
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/contact" element= {<ContactUs />}></Route>
             <Route path="/privacy" element= {<Privacy />}></Route>
             <Route path="/donate" element= {<Donate />}></Route>
+            <Route path="/payment" element= {<PaymentDetails />}></Route>
           </Routes>
         </div>
         <Footer />

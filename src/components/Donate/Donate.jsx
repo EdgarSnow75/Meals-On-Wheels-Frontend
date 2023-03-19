@@ -74,7 +74,7 @@ const Donate = () => {
                         name="fullName"
                         className="w-[30rem] input"
                         placeholder="Full Name"
-                         
+                        required
                         value ={donator.fullName}
                         onChange={ChangeHandler}
                         
@@ -95,7 +95,7 @@ const Donate = () => {
                     <div className="flex flex-col pt-5">
                         <label className="mr-4 pt-3">Donation Amount</label>
                         <input
-                        type="number"
+                        type="text"
                         name="amount"
                         className="w-[30rem] input"
                         placeholder="Donation Amount"
@@ -190,7 +190,7 @@ const Donate = () => {
                         name="comment"
                         className="w-[30rem] input"
                         placeholder="Additional Comment"
-                        required
+                     
                         value ={donator.comment}
                         onChange={ChangeHandler} 
                         />
