@@ -44,7 +44,7 @@ class PartnerService {
       password,
     } = details;
 
-    const response = await axios.post(
+    const response = await axios.put(
       `${this.#API_URI}/update`,
       {
         businessName,
@@ -63,3 +63,4 @@ class PartnerService {
     return response.data;
   }
 }
+export default new PartnerService();

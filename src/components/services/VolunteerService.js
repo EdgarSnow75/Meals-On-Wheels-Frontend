@@ -1,18 +1,17 @@
 import axios from "axios";
 
-class MemberService {
-  #API_URI = "http://localhost:3000/api/member";
+class VolunteerService {
+  #API_URI = "http://localhost:3000/api/volunteer";
 
   async signup(details) {
     const {
       firstName,
       lastName,
-      birthDate,
       emailAddress,
       address,
       contactNumber,
-      dietaryRestrictions,
-      foodAllergies,
+      daysAvailable,
+      serviceProvided,
       password,
     } = details;
 
@@ -21,12 +20,11 @@ class MemberService {
       {
         firstName,
         lastName,
-        birthDate,
         emailAddress,
         address,
         contactNumber,
-        dietaryRestrictions,
-        foodAllergies,
+        daysAvailable,
+        serviceProvided,
         password,
       },
       {
@@ -41,12 +39,11 @@ class MemberService {
     const {
       firstName,
       lastName,
-      birthDate,
       emailAddress,
       address,
       contactNumber,
-      dietaryRestrictions,
-      foodAllergies,
+      daysAvailable,
+      serviceProvided,
       password,
     } = details;
 
@@ -55,12 +52,11 @@ class MemberService {
       {
         firstName,
         lastName,
-        birthDate,
         emailAddress,
         address,
         contactNumber,
-        dietaryRestrictions,
-        foodAllergies,
+        daysAvailable,
+        serviceProvided,
         password,
       },
       {
@@ -71,4 +67,4 @@ class MemberService {
     return response.data;
   }
 }
-export default new MemberService();
+export default new VolunteerService();

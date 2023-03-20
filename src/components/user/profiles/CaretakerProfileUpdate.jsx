@@ -23,6 +23,7 @@ const CaretakerProfileUpdate = () => {
     foodAllergies: "",
     password: "",
   });
+
   const [isAllergic, setIsAllergic] = useState(false);
   const navigate = useNavigate();
 

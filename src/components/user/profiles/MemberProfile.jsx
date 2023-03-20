@@ -1,6 +1,29 @@
 import ProfilePic from "images/user.png";
+import { useEffect } from "react";
 
-const MemberProfile = () => {
+import { useNavigate } from "react-router-dom";
+
+const MemberProfile = (props) => {
+  const { isLoggedIn, setIsLoggedIn, userDetails } = props;
+
+  const navigate = useNavigate();
+
+  console.log(userDetails);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/userLogin");
+    }
+
+    if (Object.keys(userDetails).length === 0) {
+      setIsLoggedIn(false);
+    }
+  }, [isLoggedIn, userDetails]);
+
+  const handleEditProfileButton = () => {
+    navigate("/updateMemberProfile");
+  };
+
   return (
     <div>
       <div className="flex flex-col items-center">
@@ -12,44 +35,58 @@ const MemberProfile = () => {
         <div className="bg-accent shadow-md rounded-lg p-10 flex flex-col items-center text-white">
           <div className="bg-primary rounded-md p-6 mb-6">
             <h2 className="text-center mb-4 text-2xl">Member's Information</h2>
+            <h3>First name:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
-              <h3 className="pl-10 text-xl">First Name</h3>
+              <h3 className="pl-10 text-xl">{userDetails.firstName}</h3>
             </div>
+            <h3>Last name:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
-              <h3 className="pl-10 text-xl">Last Name</h3>
+              <h3 className="pl-10 text-xl">{userDetails.lastName}</h3>
             </div>
+            <h3>Email address:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
-              <h3 className="pl-10 text-xl">Email</h3>
+              <h3 className="pl-10 text-xl">{userDetails.emailAddress}</h3>
             </div>
+            <h3>Address:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
-              <h3 className="pl-10 text-xl">Full Address</h3>
+              <h3 className="pl-10 text-xl">
+                {userDetails.address?.fullAddress}
+              </h3>
             </div>
+            <h3>Contact number:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
-              <h3 className="pl-10 text-xl">Contact Number</h3>
+              <h3 className="pl-10 text-xl">{userDetails.contactNumber}</h3>
             </div>
+            <h3>Birthday:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
-              <h3 className="pl-10 text-xl">Birthday</h3>
+              <h3 className="pl-10 text-xl">
+                {userDetails.birthdate?.slice(0, 10)}
+              </h3>
             </div>
           </div>
           <div className="bg-secondary rounded-md p-6 mb-6">
             <h2 className="text-center mb-4 text-2xl">Medical Information</h2>
+            <h3>Dietary Restrictions:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
-              <h3 className="pl-10 text-xl">Dietary Restrictions</h3>
+              <h3 className="pl-10 text-xl">
+                {userDetails.dietaryRestrictions?.join(", ")}
+              </h3>
             </div>
+            <h3>Food allergies:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
-              <h3 className="pl-10 text-xl">Food Allergies</h3>
+              <h3 className="pl-10 text-xl">
+                {userDetails.foodAllergies?.join(", ")}
+              </h3>
             </div>
           </div>
           <div>
-            <button className="btn btn-primary text-lg pt-1">
-              Update Profile
+            <button
+              className="btn btn-primary text-lg pt-1"
+              onClick={handleEditProfileButton}
+            >
+              Edit Profile
             </button>
           </div>
-        </div>
-        <div>
-          <button className="btn btn-outline btn-error text-lg pt-1 mt-4">
-            Logout
-          </button>
         </div>
       </div>
     </div>

@@ -31,3 +31,4 @@ class DonationService {
     return response.data;
   }
 }
+export default new DonationService();

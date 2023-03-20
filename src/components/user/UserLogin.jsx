@@ -1,4 +1,56 @@
-const UserLogin = () => {
+import userService from "../services/UserService";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
+const UserLogin = (props) => {
+  const { isLoggedIn, setIsLoggedIn, setUserType, setUserDetails, userType } =
+    props;
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      switch (userType) {
+        case "member":
+          navigate("/memberProfile");
+          break;
+        case "caretaker":
+          navigate("/caretakerProfile");
+          break;
+        case "partner":
+          navigate("/partnerProfile");
+          break;
+        case "volunteer":
+          navigate("/volunteerProfile");
+          break;
+        case "admin":
+          navigate("/adminDashboard");
+          break;
+      }
+    }
+  }, [isLoggedIn]);
+
+  async function handleLogin(e) {
+    e.preventDefault();
+
+    const emailAddress = e.target.emailAddress?.value;
+    const password = e.target.password?.value;
+
+    const credentials = {
+      emailAddress,
+      password,
+    };
+
+    const { userType } = await userService.login(credentials);
+
+    setUserType(userType);
+
+    const userDetails = await userService.getUserDetails();
+
+    setUserDetails(userDetails);
+    setIsLoggedIn(true);
+  }
+
   return (
     <div>
       <div className="flex flex-col items-center">
@@ -9,14 +61,14 @@ const UserLogin = () => {
           <h3 className="text-center mb-4 text-xl">
             Login using your existing account
           </h3>
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="flex flex-col mb-4">
               <label className="mr-4">Your Email</label>
               <input
                 type="email"
-                name="email"
-                className="w-90 input"
-                placeholder="Email"
+                name="emailAddress"
+                className="w-90 input text-black"
+                placeholder="Email address"
                 required
               />
             </div>
@@ -25,13 +77,13 @@ const UserLogin = () => {
               <input
                 type="password"
                 name="password"
-                className="w-90 input"
+                className="w-90 input text-black"
                 placeholder="Password"
                 required
               />
             </div>
             <div className="flex justify-center items-center">
-              <button type="submit" className="btn w-32 btn-primary mt-6">
+              <button type="submit" className="btn w-32 btn-primary mt-6 mb-2">
                 Login
               </button>
             </div>

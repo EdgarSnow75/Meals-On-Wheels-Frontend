@@ -1,52 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import VolunteerService from "../services/VolunteerService";
 
 const VolunteerForm = () => {
-  const [volunteer, setVolunteer] = useState({
-    firstName: "",
-    lastName: "",
-    emailAddress: "",
-    address: "",
-    contactNumber: "",
-    daysAvailable: "",
-    serviceProvided: "",
-    password: "",
-  });
   const navigate = useNavigate();
   const [isAllDaysChecked, setIsAllDaysChecked] = useState(false);
+  const [days, setDays] = useState([]);
 
   const inputChangeHandler = (event) => {
     const target = event.target;
     const name = target.name;
     const value = target.type === "checkbox" ? target.checked : target.value;
 
-    if (target.type === "checkbox") {
-      // Get the current list of dietary days
-      let days = volunteer.daysAvailable || [];
+    let daysArray = days || [];
 
-      if (value) {
-        // If the checkbox is checked, add the value to the list
-        days.push(name);
-      } else {
-        // If the checkbox is unchecked, remove the value from the list
-        const index = days.indexOf(name);
-        if (index !== -1) {
-          days = [...days.slice(0, index), ...days.slice(index + 1)];
-        }
-      }
-
-      // Update the volunteer with the new list of dietary days
-      setVolunteer({
-        ...volunteer,
-        daysAvailable: days,
-      });
+    if (value) {
+      // If the checkbox is checked, add the value to the list
+      daysArray.push(name);
     } else {
-      // For other input types, update the volunteer with the new value
-      setVolunteer({
-        ...volunteer,
-        [name]: value,
-      });
+      // If the checkbox is unchecked, remove the value from the list
+      const index = daysArray.indexOf(name);
+      if (index !== -1) {
+        daysArray = [
+          ...daysArray.slice(0, index),
+          ...daysArray.slice(index + 1),
+        ];
+      }
     }
+
+    // Update the partner with the new list of dietary days
+    setDays(daysArray);
   };
 
   const handleAllDaysChange = (event) => {
@@ -55,33 +38,43 @@ const VolunteerForm = () => {
 
     const newDaysAvailable = isChecked
       ? [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday",
         ]
       : [];
-    setVolunteer((prevVolunteer) => ({
-      ...prevVolunteer,
-      daysAvailable: newDaysAvailable,
-    }));
+
+    setDays(newDaysAvailable);
   };
 
-  const submitHandler = (event) => {
-    event.preventDefault();
-    console.log("hi");
-    console.log(volunteer);
-    alert("You've been successfully registered as a volunteer!");
-    console.log(volunteer);
-    console.log(volunteer.firstName);
-    console.log(volunteer.address);
-    console.log(volunteer.emailAddress);
-    console.log(volunteer.daysAvailable);
-    console.log(volunteer.password);
-    console.log(volunteer.serviceProvided);
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    const firstName = e.target.firstName?.value;
+    const lastName = e.target.lastName?.value;
+    const emailAddress = e.target.emailAddress?.value;
+    const address = e.target.address?.value;
+    const contactNumber = e.target.contactNumber?.value;
+    const daysAvailable = days;
+    const serviceProvided = e.target.serviceProvided?.value;
+    const password = e.target.password?.value;
+
+    const response = await VolunteerService.signup({
+      firstName,
+      lastName,
+      emailAddress,
+      address,
+      contactNumber,
+      daysAvailable,
+      serviceProvided,
+      password,
+    });
+
+    console.log(response);
   };
 
   const handleLink = (path) => {
@@ -102,8 +95,6 @@ const VolunteerForm = () => {
               name="firstName"
               className="w-[30rem] input text-black"
               placeholder="First Name"
-              value={volunteer.firstName}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -114,8 +105,6 @@ const VolunteerForm = () => {
               name="lastName"
               className="w-[30rem] input text-black"
               placeholder="Last Name"
-              value={volunteer.lastName}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -126,8 +115,6 @@ const VolunteerForm = () => {
               name="emailAddress"
               className="w-[30rem] input text-black"
               placeholder="Email"
-              value={volunteer.emailAddress}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -135,11 +122,9 @@ const VolunteerForm = () => {
             <label className="mr-4">Full Address</label>
             <input
               type="text"
-              name="userAddress"
+              name="address"
               className="w-[30rem] input text-black"
               placeholder="Address:"
-              value={volunteer.fullAddress}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -150,8 +135,6 @@ const VolunteerForm = () => {
               name="contactNumber"
               className="w-[30rem] input text-black"
               placeholder="Contact"
-              value={volunteer.contactNumber}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -161,70 +144,70 @@ const VolunteerForm = () => {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Monday"
+                  name="monday"
                   className="mr-2 checkbox-secondary"
-                  checked={volunteer.daysAvailable?.includes("Monday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("monday")}
                 />
                 Monday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Tuesday"
+                  name="tuesday"
                   className="mr-2 checkbox-secondary"
-                  checked={volunteer.daysAvailable?.includes("Tuesday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("tuesday")}
                 />
                 Tuesday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Wednesday"
+                  name="wednesday"
                   className="mr-2 checkbox-secondary"
-                  checked={volunteer.daysAvailable?.includes("Wednesday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("wednesday")}
                 />
                 Wednesday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Thursday"
+                  name="thursday"
                   className="mr-2 checkbox-secondary"
-                  checked={volunteer.daysAvailable?.includes("Thursday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("thursday")}
                 />
                 Thursday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Friday"
+                  name="friday"
                   className="mr-2 checkbox-secondary"
-                  checked={volunteer.daysAvailable?.includes("Friday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("friday")}
                 />
                 Friday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Saturday"
+                  name="saturday"
                   className="mr-2 checkbox-secondary"
-                  checked={volunteer.daysAvailable?.includes("Saturday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("saturday")}
                 />
                 Saturday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Sunday"
+                  name="sunday"
                   className="mr-2 checkbox-secondary"
-                  checked={volunteer.daysAvailable?.includes("Sunday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("sunday")}
                 />
                 Sunday
               </label>
@@ -244,8 +227,6 @@ const VolunteerForm = () => {
             <select
               name="serviceProvided"
               className="w-[30rem] input text-black"
-              value={volunteer.serviceProvided}
-              onChange={inputChangeHandler}
               required
             >
               <option value="">Select Service Type</option>
@@ -260,8 +241,6 @@ const VolunteerForm = () => {
               name="password"
               className="w-[30rem] input text-black"
               placeholder="Password"
-              value={volunteer.password}
-              onChange={inputChangeHandler}
               required
             />
           </div>

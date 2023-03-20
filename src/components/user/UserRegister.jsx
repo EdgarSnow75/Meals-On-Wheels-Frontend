@@ -1,11 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CareTakerForm from "./CareTakerForm";
 import MemberRegisterFrom from "./MemberRegisterForm";
 import PartnerForm from "./PartnerForm";
 import VolunteerForm from "./VolunteerForm";
 
-const UserRegister = () => {
+const UserRegister = (props) => {
+  const { isLoggedIn, userType } = props;
+  const navigate = useNavigate();
   const [form, setForm] = useState("Member");
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      switch (userType) {
+        case "member":
+          navigate("/memberProfile");
+          break;
+        case "caretaker":
+          navigate("/caretakerProfile");
+          break;
+        case "partner":
+          navigate("/partnerProfile");
+          break;
+        case "volunteer":
+          navigate("/volunteerProfile");
+          break;
+        case "admin":
+          navigate("/adminDashboard");
+          break;
+      }
+    }
+  }, [isLoggedIn]);
 
   const onChangeHandler = (event) => {
     const target = event.target;

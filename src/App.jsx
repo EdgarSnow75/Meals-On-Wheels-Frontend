@@ -23,38 +23,125 @@ import MemberProfile from "./components/user/profiles/MemberProfile";
 import CaretakerProfile from "./components/user/profiles/CaretakerProfile";
 import PartnerProfile from "./components/user/profiles/PartnerProfile";
 import VolunteerProfile from "./components/user/profiles/VolunteerProfile";
-import Volunteer from "./components/volunteer/Volunteer";
-import AboutUs from "./components/about/AboutUs"
-import ContactUs from "./components/contactus/ContactUs";
-import Privacy from "./components/privacy/Privacy";
+import Volunteer from "./components/mainContents/Volunteer";
+import AboutUs from "./components/misc/AboutUs";
+import ContactUs from "./components/misc/ContactUs";
+import Privacy from "./components/misc/Privacy";
 import Donate from "./components/Donate/Donate";
-import PaymentDetails from "./components/paymentDetails/PaymentDetails";
+import PaymentDetails from "./components/Donate/PaymentDetails";
+import MemberProfileUpdate from "./components/user/profiles/MemberProfileUpdate";
+import UserService from "./components/services/UserService";
+import NearbyPartners from "./components/mainContents/NearbyPartners";
 
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState("");
+  const [userDetails, setUserDetails] = useState({});
+
   useEffect(() => {
     WebFont.load({ google: { families: ["Josefin Sans"] } });
+
+    UserService.getUserDetails().then((response) => {
+      if (response) {
+        setIsLoggedIn(true);
+        setUserDetails(response);
+        setUserType(response.userType);
+      }
+    });
   }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setUserType("");
+      setUserDetails({});
+    }
+  }, [isLoggedIn]);
 
   return (
     <div className="App" data-theme="violetta">
       <Router>
-        <Header />
+        <Header
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}
+          userDetails={userDetails}
+          userType={userType}
+        />
         <div className="px-2 my-4 ">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="*" element={<PathError />} />
-            <Route path="/userRegister" element={<UserRegister />} />
-            <Route path="/userLogin" element={<UserLogin />}></Route>
-            <Route path="/adminDashboard" element={<AdminDashBoard />}></Route>
-            <Route path="/memberProfile" element={<MemberProfile />}></Route>
-            <Route path="/partnerProfile" element={<PartnerProfile />}></Route>
+            <Route
+              path="/userRegister"
+              element={
+                <UserRegister isLoggedIn={isLoggedIn} userType={userType} />
+              }
+            />
+            <Route
+              path="/userLogin"
+              element={
+                <UserLogin
+                  isLoggedIn={isLoggedIn}
+                  setIsLoggedIn={setIsLoggedIn}
+                  setUserType={setUserType}
+                  setUserDetails={setUserDetails}
+                  userType={userType}
+                />
+              }
+            ></Route>
+            <Route
+              path="/adminDashboard"
+              element={
+                <AdminDashBoard
+                  isLoggedIn={isLoggedIn}
+                  userDetails={userDetails}
+                />
+              }
+            ></Route>
+            <Route
+              path="/memberProfile"
+              element={
+                <MemberProfile
+                  isLoggedIn={isLoggedIn}
+                  setIsLoggedIn={setIsLoggedIn}
+                  userDetails={userDetails}
+                />
+              }
+            ></Route>
+            <Route
+              path="/updateMemberProfile"
+              element={
+                <MemberProfileUpdate
+                  isLoggedIn={isLoggedIn}
+                  userDetails={userDetails}
+                />
+              }
+            ></Route>
+            <Route
+              path="/partnerProfile"
+              element={
+                <PartnerProfile
+                  isLoggedIn={isLoggedIn}
+                  userDetails={userDetails}
+                />
+              }
+            ></Route>
             <Route
               path="/volunteerProfile"
-              element={<VolunteerProfile />}
+              element={
+                <VolunteerProfile
+                  isLoggedIn={isLoggedIn}
+                  userDetails={userDetails}
+                />
+              }
             ></Route>
             <Route
               path="/caretakerProfile"
-              element={<CaretakerProfile />}
+              element={
+                <CaretakerProfile
+                  isLoggedIn={isLoggedIn}
+                  userDetails={userDetails}
+                />
+              }
             ></Route>
             <Route
               path="/adminDashboard/memberCreate"
@@ -72,12 +159,13 @@ const App = () => {
               path="/adminDashboard/volunteerCreate"
               element={<VolunteerCreateForm />}
             ></Route>
-            <Route path="/volunteer" element={<Volunteer />}></Route>
-            <Route path="/about" element={<AboutUs />}></Route>
-            <Route path="/contact" element= {<ContactUs />}></Route>
-            <Route path="/privacy" element= {<Privacy />}></Route>
-            <Route path="/donate" element= {<Donate />}></Route>
-            <Route path="/payment" element= {<PaymentDetails />}></Route>
+            <Route path="/volunteerPromotion" element={<Volunteer />}></Route>
+            <Route path="/aboutUs" element={<AboutUs />}></Route>
+            <Route path="/contactUs" element={<ContactUs />}></Route>
+            <Route path="/privacyPolicy" element={<Privacy />}></Route>
+            <Route path="/donate" element={<Donate />}></Route>
+            <Route path="/paymentDetails" element={<PaymentDetails />}></Route>
+            <Route path="/nearby" element={<NearbyPartners />}></Route>
           </Routes>
         </div>
         <Footer />

@@ -1,19 +1,18 @@
 import axios from "axios";
 
-class MemberService {
-  #API_URI = "http://localhost:3000/api/member";
+class CaregiverService {
+  #API_URI = "http://localhost:3000/api/caregiver";
 
   async signup(details) {
     const {
       firstName,
       lastName,
-      birthDate,
       emailAddress,
       address,
       contactNumber,
-      dietaryRestrictions,
-      foodAllergies,
+      relationshipToMember,
       password,
+      memberDetails,
     } = details;
 
     const response = await axios.post(
@@ -21,13 +20,12 @@ class MemberService {
       {
         firstName,
         lastName,
-        birthDate,
         emailAddress,
         address,
         contactNumber,
-        dietaryRestrictions,
-        foodAllergies,
+        relationshipToMember,
         password,
+        memberDetails,
       },
       {
         withCredentials: true,
@@ -41,13 +39,12 @@ class MemberService {
     const {
       firstName,
       lastName,
-      birthDate,
       emailAddress,
       address,
       contactNumber,
-      dietaryRestrictions,
-      foodAllergies,
+      relationshipToMember,
       password,
+      memberDetails,
     } = details;
 
     const response = await axios.put(
@@ -55,13 +52,12 @@ class MemberService {
       {
         firstName,
         lastName,
-        birthDate,
         emailAddress,
         address,
         contactNumber,
-        dietaryRestrictions,
-        foodAllergies,
+        relationshipToMember,
         password,
+        memberDetails,
       },
       {
         withCredentials: true,
@@ -71,4 +67,5 @@ class MemberService {
     return response.data;
   }
 }
-export default new MemberService();
+
+export default new CaregiverService();

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../../generic/BackButton";
+import MemberService from "../../services/MemberService";
 
-const MemberProfileUpdate = () => {
+const MemberProfileUpdate = (props) => {
+  const { isLoggedIn, userDetails } = props;
   const [member, setMember] = useState({
     firstName: "",
     lastName: "",
@@ -12,11 +14,45 @@ const MemberProfileUpdate = () => {
     contactNumber: "",
     dietaryRestrictions: "",
     foodAllergies: "",
-    password: "",
   });
 
   const [isAllergic, setIsAllergic] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/userLogin");
+    } else {
+      setMember({
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        birthdate: userDetails.birthdate.slice(0, 10),
+        emailAddress: userDetails.emailAddress,
+        address: userDetails.address.fullAddress,
+        contactNumber: userDetails.contactNumber,
+        dietaryRestrictions: userDetails.dietaryRestrictions,
+        foodAllergies: userDetails.foodAllergies,
+      });
+    }
+  }, [isLoggedIn, userDetails]);
+
+  // Check checkbox if dietary restriction is present using useEffect
+  useEffect(() => {
+    const updateProfileForm = document.getElementById("updateProfileForm");
+    const checkboxes = updateProfileForm.querySelectorAll(
+      "input[type=checkbox]"
+    );
+
+    checkboxes.forEach((checkbox) => {
+      if (member.dietaryRestrictions.includes(checkbox.name)) {
+        checkbox.checked = true;
+      }
+
+      if (member.foodAllergies?.length > 0) {
+        setIsAllergic(true);
+      }
+    });
+  }, [member]);
 
   const inputChangeHandler = (event) => {
     const target = event.target;
@@ -41,7 +77,7 @@ const MemberProfileUpdate = () => {
         }
       }
       if (name === "foodAllergic" && !checked) {
-        member.foodAllergies = "";
+        member.foodAllergies = [];
       }
 
       // Update the member with the new list of dietary restrictions
@@ -50,6 +86,15 @@ const MemberProfileUpdate = () => {
         dietaryRestrictions: restrictions,
       });
     } else {
+      // For food allergies
+      if (name === "foodAllergies") {
+        // Get the current list of food allergies
+        return setMember({
+          ...member,
+          foodAllergies: value.split(",").map((item) => item.trim()),
+        });
+      }
+
       // For other input types, update the member with the new value
       setMember({
         ...member,
@@ -66,9 +111,14 @@ const MemberProfileUpdate = () => {
     }
   };
 
-  const submitHandler = () => {
-    console.log("hi");
-    alert("Your profile as been updated successfully");
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await MemberService.update(member);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleLink = (path) => {
@@ -83,6 +133,7 @@ const MemberProfileUpdate = () => {
         </h2>
         <div className="rounded-md w-[35rem] shadow-md p-10 pt-2 my-4 ring-[0.5px] ring-[rgba(0,0,0,0.2) bg-accent">
           <form
+            id="updateProfileForm"
             onSubmit={submitHandler}
             className="mt-8 max-w-md grid grid-cols-1 gap-6"
           >
@@ -91,7 +142,7 @@ const MemberProfileUpdate = () => {
               <input
                 type="text"
                 name="firstName"
-                className="w-[30rem] input"
+                className="w-[30rem] input text-black"
                 placeholder="First Name"
                 value={member.firstName}
                 onChange={inputChangeHandler}
@@ -103,7 +154,7 @@ const MemberProfileUpdate = () => {
               <input
                 type="text"
                 name="lastName"
-                className="w-[30rem] input"
+                className="w-[30rem] input text-black"
                 placeholder="Last Name"
                 value={member.lastName}
                 onChange={inputChangeHandler}
@@ -127,7 +178,7 @@ const MemberProfileUpdate = () => {
               <input
                 type="email"
                 name="emailAddress"
-                className="w-[30rem] input"
+                className="w-[30rem] input text-black"
                 placeholder="Email"
                 value={member.emailAddress}
                 onChange={inputChangeHandler}
@@ -139,7 +190,7 @@ const MemberProfileUpdate = () => {
               <input
                 type="text"
                 name="userAddress"
-                className="w-[30rem] input"
+                className="w-[30rem] input text-black"
                 placeholder="Address:"
                 value={member.address}
                 onChange={inputChangeHandler}
@@ -151,7 +202,7 @@ const MemberProfileUpdate = () => {
               <input
                 type="text"
                 name="contactNumber"
-                className="w-[30rem] input"
+                className="w-[30rem] input text-black"
                 placeholder="Contact"
                 value={member.contactNumber}
                 onChange={inputChangeHandler}
@@ -260,7 +311,7 @@ const MemberProfileUpdate = () => {
                     <input
                       type="text"
                       name="foodAllergies"
-                      className="w-[30rem] input"
+                      className="w-[30rem] input text-black"
                       value={member.foodAllergies}
                       onChange={inputChangeHandler}
                       placeholder="Please specify your food allergies"
@@ -277,18 +328,6 @@ const MemberProfileUpdate = () => {
                 className="file:py-2 file:px-4 file:rounded-full file:border-0 file:text-md file:font-semibold
               file:bg-primary file:text-white
               hover:file:bg-primary-focus"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="mr-4">Password</label>
-              <input
-                type="password"
-                name="password"
-                className="w-[30rem] input"
-                placeholder="Password"
-                value={member.password}
-                onChange={inputChangeHandler}
-                required
               />
             </div>
             <div>

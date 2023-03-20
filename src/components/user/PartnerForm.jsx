@@ -1,51 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PartnerService from "../services/PartnerService";
 
 const PartnerForm = () => {
-  const [partner, setPartner] = useState({
-    businessName: "",
-    emailAddress: "",
-    address: "",
-    contactNumber: "",
-    daysAvailable: "",
-    serviceType: "",
-    password: "",
-  });
   const navigate = useNavigate();
   const [isAllDaysChecked, setIsAllDaysChecked] = useState(false);
+  const [days, setDays] = useState([]);
 
   const inputChangeHandler = (event) => {
     const target = event.target;
     const name = target.name;
     const value = target.type === "checkbox" ? target.checked : target.value;
 
-    if (target.type === "checkbox") {
-      // Get the current list of dietary days
-      let days = partner.daysAvailable || [];
+    let daysArray = days || [];
 
-      if (value) {
-        // If the checkbox is checked, add the value to the list
-        days.push(name);
-      } else {
-        // If the checkbox is unchecked, remove the value from the list
-        const index = days.indexOf(name);
-        if (index !== -1) {
-          days = [...days.slice(0, index), ...days.slice(index + 1)];
-        }
-      }
-
-      // Update the partner with the new list of dietary days
-      setPartner({
-        ...partner,
-        daysAvailable: days,
-      });
+    if (value) {
+      // If the checkbox is checked, add the value to the list
+      daysArray.push(name);
     } else {
-      // For other input types, update the partner with the new value
-      setPartner({
-        ...partner,
-        [name]: value,
-      });
+      // If the checkbox is unchecked, remove the value from the list
+      const index = daysArray.indexOf(name);
+      if (index !== -1) {
+        daysArray = [
+          ...daysArray.slice(0, index),
+          ...daysArray.slice(index + 1),
+        ];
+      }
     }
+
+    // Update the partner with the new list of dietary days
+    setDays(daysArray);
   };
 
   const handleAllDaysChange = (event) => {
@@ -54,33 +38,41 @@ const PartnerForm = () => {
 
     const newDaysAvailable = isChecked
       ? [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday",
         ]
       : [];
-    setPartner((prevPartner) => ({
-      ...prevPartner,
-      daysAvailable: newDaysAvailable,
-    }));
+
+    setDays(newDaysAvailable);
   };
 
-  const submitHandler = (event) => {
-    event.preventDefault();
-    console.log("hi");
-    console.log(partner);
-    alert("You've been successfully registered as a partner!");
-    console.log(partner);
-    console.log(partner.businessName);
-    console.log(partner.address);
-    console.log(partner.emailAddress);
-    console.log(partner.daysAvailable);
-    console.log(partner.password);
-    console.log(partner.serviceType);
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    const businessName = e.target.businessName?.value;
+    const emailAddress = e.target.emailAddress?.value;
+    const address = e.target.address?.value;
+    const contactNumber = e.target.contactNumber?.value;
+    const daysAvailable = days;
+    const serviceType = e.target.serviceType?.value;
+    const password = e.target.password?.value;
+
+    const response = await PartnerService.signup({
+      businessName,
+      emailAddress,
+      address,
+      contactNumber,
+      daysAvailable,
+      serviceType,
+      password,
+    });
+
+    console.log(response);
   };
 
   const handleLink = (path) => {
@@ -101,8 +93,6 @@ const PartnerForm = () => {
               name="businessName"
               className="w-[30rem] input text-black"
               placeholder="Business Name"
-              value={partner.businessName}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -113,8 +103,6 @@ const PartnerForm = () => {
               name="emailAddress"
               className="w-[30rem] input text-black"
               placeholder="Email"
-              value={partner.emailAddress}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -122,11 +110,9 @@ const PartnerForm = () => {
             <label className="mr-4">Full Address</label>
             <input
               type="text"
-              name="userAddress"
+              name="address"
               className="w-[30rem] input text-black"
               placeholder="Address:"
-              value={partner.fullAddress}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -137,8 +123,6 @@ const PartnerForm = () => {
               name="contactNumber"
               className="w-[30rem] input text-black"
               placeholder="Contact"
-              value={partner.contactNumber}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -148,70 +132,70 @@ const PartnerForm = () => {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Monday"
+                  name="monday"
                   className="mr-2 checkbox-secondary"
-                  checked={partner.daysAvailable?.includes("Monday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("monday")}
                 />
                 Monday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Tuesday"
+                  name="tuesday"
                   className="mr-2 checkbox-secondary"
-                  checked={partner.daysAvailable?.includes("Tuesday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("tuesday")}
                 />
                 Tuesday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Wednesday"
+                  name="wednesday"
                   className="mr-2 checkbox-secondary"
-                  checked={partner.daysAvailable?.includes("Wednesday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("wednesday")}
                 />
                 Wednesday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Thursday"
+                  name="thursday"
                   className="mr-2 checkbox-secondary"
-                  checked={partner.daysAvailable?.includes("Thursday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("thursday")}
                 />
                 Thursday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Friday"
+                  name="friday"
                   className="mr-2 checkbox-secondary"
-                  checked={partner.daysAvailable?.includes("Friday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("friday")}
                 />
                 Friday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Saturday"
+                  name="saturday"
                   className="mr-2 checkbox-secondary"
-                  checked={partner.daysAvailable?.includes("Saturday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("saturday")}
                 />
                 Saturday
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  name="Sunday"
+                  name="sunday"
                   className="mr-2 checkbox-secondary"
-                  checked={partner.daysAvailable?.includes("Sunday")}
                   onChange={inputChangeHandler}
+                  checked={days.includes("sunday")}
                 />
                 Sunday
               </label>
@@ -219,7 +203,6 @@ const PartnerForm = () => {
                 <input
                   type="checkbox"
                   className="mr-2 checkbox-secondary"
-                  checked={isAllDaysChecked}
                   onChange={handleAllDaysChange}
                 />
                 All Days
@@ -241,12 +224,10 @@ const PartnerForm = () => {
             <select
               name="serviceType"
               className="w-[30rem] input text-black"
-              value={partner.serviceType}
-              onChange={inputChangeHandler}
               required
             >
               <option value="">Select Service Type</option>
-              <option value="restraurant">
+              <option value="restaurant">
                 Restaurant (Hot and Frozen meals)
               </option>
               <option value="grocery">
@@ -261,8 +242,6 @@ const PartnerForm = () => {
               name="password"
               className="w-[30rem] input text-black"
               placeholder="Password"
-              value={partner.password}
-              onChange={inputChangeHandler}
               required
             />
           </div>
@@ -292,4 +271,5 @@ const PartnerForm = () => {
     </div>
   );
 };
+
 export default PartnerForm;

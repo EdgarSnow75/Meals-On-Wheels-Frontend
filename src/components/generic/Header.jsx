@@ -1,16 +1,53 @@
 import DownArrow from "images/down-arrow.png";
 import MainLogo from "images/Logo.png";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import UserService from "../services/UserService";
 
-const Header = () => {
+const Header = (props) => {
+  const { isLoggedIn, setIsLoggedIn, userDetails, userType } = props;
+  const [profileLink, setProfileLink] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      switch (userType) {
+        case "member":
+          setProfileLink("/memberProfile");
+          break;
+        case "caretaker":
+          setProfileLink("/caretakerProfile");
+          break;
+        case "partner":
+          setProfileLink("/partnerProfile");
+          break;
+        case "volunteer":
+          setProfileLink("/volunteerProfile");
+          break;
+        case "admin":
+          setProfileLink("/adminDashboard");
+          break;
+      }
+    }
+  }, [isLoggedIn]);
+
+  const handleLogout = async () => {
+    const response = await UserService.logout();
+
+    setIsLoggedIn(false);
+
+    console.log(response);
+
+    navigate("/userLogin");
+  };
 
   const linkHandler = (path) => {
     navigate(path);
   };
+
   return (
     <div className="navbar bg-base-100 shadow-xl rounded-md w-full font-sans sticky top-0 z-10">
-      <div className="navbar-start ml-3">
+      <div className="navbar-start ml-3 flex-1">
         <div className="dropdown">
           <label tabIndex={0} className="btn btn-ghost lg:hidden">
             <svg
@@ -113,7 +150,7 @@ const Header = () => {
         <div className="mr-6">
           <button className="btn btn-primary font-bold pt-1">Donate</button>
         </div>
-        <div className="">
+        <div className={`${isLoggedIn ? "hidden" : ""}`}>
           <button
             className="btn btn-outline btn-secondary mr-2 font-bold pt-1"
             onClick={() => linkHandler("/userLogin")}
@@ -127,6 +164,34 @@ const Header = () => {
             Sign Up
           </button>
         </div>
+      </div>
+      <div className={`dropdown dropdown-end ${!isLoggedIn ? "hidden" : ""}`}>
+        <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+          <div className="w-10 rounded-full">
+            <img src="/src/images/user.png" />
+          </div>
+        </label>
+        <ul
+          tabIndex={0}
+          className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
+        >
+          <li className="pointer-events-none rounded-xl px-4 py-1.5 mb-2 text-white bg-primary drop-shadow-sm">
+            <span className="m-0 p-0">Logged in as:</span>
+            <span className="italic font-bold m-0 p-0">
+              {userDetails.emailAddress}
+            </span>
+          </li>
+          <li>
+            <Link to={profileLink}>
+              <a className="justify-between">
+                {userType === "admin" ? "Admin dashboard" : "Profile"}
+              </a>
+            </Link>
+          </li>
+          <li onClick={handleLogout}>
+            <a onClick={handleLogout}>Log out</a>
+          </li>
+        </ul>
       </div>
     </div>
   );
