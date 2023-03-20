@@ -1,7 +1,37 @@
-
+import { useState } from "react";
 
 const PaymentDetails = ( ) => {
+    
+    const [payment, setPayment ] = useState({
+        cardFirstName: "",
+        cardLastName: "",
+        cardNumber: "",
+        expMonth: "",
+        expYear: "",
+        CVV: "",
+    
+      
+      });
+      const ChangeHandler = (event) => {
+        const target = event.target;
+        const name = target.name;
+        const value = target.type === "radio" ? target.checked : target.value;
 
+        setPayment({
+            ...payment,
+            [name]: value,
+          });
+      }
+
+      const submitHandler = () => {
+        console.log("");
+        alert("Thank you for your donation");
+      };
+    
+      const handleLink = (path) => {
+        navigate(path);
+      };
+    
 
       
     return (
@@ -12,7 +42,7 @@ const PaymentDetails = ( ) => {
                         Payment Details
                     </h1>
                         <form 
-                    
+                        onSubmit={submitHandler}
                         className="
                         rounded-md w-[35rem] 
                         shadow-md 
@@ -23,12 +53,14 @@ const PaymentDetails = ( ) => {
                         ring-black 
                         bg- 
                         mt-8 
-                        gap-6">
+                        gap-6"
+                        
+                        >
                             <div className="flex flex-col ">
                                 <label className="mr-4">First Name</label>
                                 <input
                                 type="text"
-                                name="firstName"
+                                name="cardFirstName"
                                 className="w-[30rem] input                  
                                 shadow-sm 
                                 bg-gray-50 
@@ -47,7 +79,8 @@ const PaymentDetails = ( ) => {
                                 "
                                 placeholder="Card Holder's First Name"
                                 required
-                                
+                                value ={payment.cardFirstName}
+                                onChange={ChangeHandler}
                              
                                 />
                             </div>
@@ -74,7 +107,8 @@ const PaymentDetails = ( ) => {
                                 "
                                 placeholder="Card Holder's Last Name "
                                 required
-                             
+                                value ={payment.cardLastName}
+                                onChange={ChangeHandler}
                                 />
                             </div>
                             <div className="flex flex-col pt-5">
@@ -99,7 +133,8 @@ const PaymentDetails = ( ) => {
                                 dark:shadow-sm-light"
                                 placeholder="Card Number"
                                 required
-                                
+                                value ={payment.cardNumber}
+                                onChange={ChangeHandler}
                                 />
                             
                             </div>
@@ -108,7 +143,7 @@ const PaymentDetails = ( ) => {
                                 <label className="mr-4 pt-3">Expiry Date</label>
                                 <span>
                                 <input type="text" 
-                                name="month" 
+                                name="expMonth" 
                                 placeholder="MM" 
                                 maxlength="2" 
                                 size="2" 
@@ -127,11 +162,14 @@ const PaymentDetails = ( ) => {
                                 dark:focus:ring-blue-500 
                                 dark:focus:border-blue-500 
                                 dark:shadow-sm-light
-                                "/>
+                                "
+                                value ={payment.expMonth}
+                                onChange={ChangeHandler}
+                                />
                                 <span>/</span>
                                 <input 
                                 type="text" 
-                                name="year" 
+                                name="expYear" 
                                 placeholder="YY" 
                                 maxlength="2" 
                                 size="2" 
@@ -150,7 +188,9 @@ const PaymentDetails = ( ) => {
                                 dark:focus:ring-blue-500 
                                 dark:focus:border-blue-500 
                                 dark:shadow-sm-light"
-                                />
+                                
+                                value ={payment.expYear}
+                                onChange={ChangeHandler}/>
                                 </span>
                                 
                             </div>
@@ -159,7 +199,7 @@ const PaymentDetails = ( ) => {
                                 <label className="mr-4 pt-3">CVV</label>
                                 <input
                                 type="text"
-                                name="comment"
+                                name="CVV"
                                 className="w-[10rem] input
                                 shadow-sm 
                                 bg-gray-50 
@@ -179,7 +219,8 @@ const PaymentDetails = ( ) => {
                                 placeholder="CVV"
                                 maxlength="3" size="3"
                                 required
-                             
+                                value ={payment.CVV}
+                                onChange={ChangeHandler}
                                 />
                             </div>
 
