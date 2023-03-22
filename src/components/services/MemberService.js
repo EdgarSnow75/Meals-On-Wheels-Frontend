@@ -7,7 +7,7 @@ class MemberService {
     const {
       firstName,
       lastName,
-      birthDate,
+      birthdate,
       emailAddress,
       address,
       contactNumber,
@@ -21,7 +21,7 @@ class MemberService {
       {
         firstName,
         lastName,
-        birthDate,
+        birthdate,
         emailAddress,
         address,
         contactNumber,
@@ -41,7 +41,7 @@ class MemberService {
     const {
       firstName,
       lastName,
-      birthDate,
+      birthdate,
       emailAddress,
       address,
       contactNumber,
@@ -55,7 +55,7 @@ class MemberService {
       {
         firstName,
         lastName,
-        birthDate,
+        birthdate,
         emailAddress,
         address,
         contactNumber,

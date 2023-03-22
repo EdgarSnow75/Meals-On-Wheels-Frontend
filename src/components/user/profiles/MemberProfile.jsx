@@ -8,8 +8,6 @@ const MemberProfile = (props) => {
 
   const navigate = useNavigate();
 
-  console.log(userDetails);
-
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/userLogin");
@@ -35,29 +33,29 @@ const MemberProfile = (props) => {
         <div className="bg-accent shadow-md rounded-lg p-10 flex flex-col items-center text-white">
           <div className="bg-primary rounded-md p-6 mb-6">
             <h2 className="text-center mb-4 text-2xl">Member's Information</h2>
-            <h3>First name:</h3>
+            <h3 className="mb-1">First name:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
               <h3 className="pl-10 text-xl">{userDetails.firstName}</h3>
             </div>
-            <h3>Last name:</h3>
+            <h3 className="mb-1">Last name:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
               <h3 className="pl-10 text-xl">{userDetails.lastName}</h3>
             </div>
-            <h3>Email address:</h3>
+            <h3 className="mb-1">Email address:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
               <h3 className="pl-10 text-xl">{userDetails.emailAddress}</h3>
             </div>
-            <h3>Address:</h3>
+            <h3 className="mb-1">Address:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
               <h3 className="pl-10 text-xl">
                 {userDetails.address?.fullAddress}
               </h3>
             </div>
-            <h3>Contact number:</h3>
+            <h3 className="mb-1">Contact number:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
               <h3 className="pl-10 text-xl">{userDetails.contactNumber}</h3>
             </div>
-            <h3>Birthday:</h3>
+            <h3 className="mb-1">Birthday:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
               <h3 className="pl-10 text-xl">
                 {userDetails.birthdate?.slice(0, 10)}
@@ -66,13 +64,13 @@ const MemberProfile = (props) => {
           </div>
           <div className="bg-secondary rounded-md p-6 mb-6">
             <h2 className="text-center mb-4 text-2xl">Medical Information</h2>
-            <h3>Dietary Restrictions:</h3>
+            <h3 className="mb-1">Dietary Restrictions:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
               <h3 className="pl-10 text-xl">
                 {userDetails.dietaryRestrictions?.join(", ")}
               </h3>
             </div>
-            <h3>Food allergies:</h3>
+            <h3 className="mb-1">Food allergies:</h3>
             <div className="rounded-box w-[40rem] bg-base-100 ring-4 ring-black text-black p-2 mb-5">
               <h3 className="pl-10 text-xl">
                 {userDetails.foodAllergies?.join(", ")}

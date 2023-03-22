@@ -1,6 +1,9 @@
 import MainLogo from "images/Logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
   return (
     <footer className="footer flex flex-col flex-nowrap justify-cente align-middle items-center p-5 bg-primary text-primary-content gap-y-0">
       <div className="footer-center">
@@ -11,15 +14,33 @@ const Footer = () => {
       </div>
       <div className="flex w-full justify-between footer-center">
         <div className="text-lg">
-          <a>Privacy Policy</a>
+          <a
+            className="link link-hover"
+            onClick={() => navigate("/privacyPolicy")}
+          >
+            Privacy Policy
+          </a>
           <p>Copyright © 2018-2023 - All right reserved</p>
         </div>
         <div className="grid grid-flow-col gap-20 mr-44 text-xl">
-          <a className="link link-hover">Learn More</a>
-          <a className="link link-hover">Support</a>
-          <a className="link link-hover">Volunteer for Us</a>
-          <a className="link link-hover">About Us</a>
-          <a className="link link-hover">Contact Us</a>
+          <a className="link link-hover" onClick={() => navigate("/aboutUs")}>
+            Learn More
+          </a>
+          <a className="link link-hover" onClick={() => navigate("/donate")}>
+            Support
+          </a>
+          <a
+            className="link link-hover"
+            onClick={() => navigate("/volunteerPromotion")}
+          >
+            Volunteer for Us
+          </a>
+          <a className="link link-hover" onClick={() => navigate("/aboutUs")}>
+            About Us
+          </a>
+          <a className="link link-hover" onClick={() => navigate("/contactUs")}>
+            Contact Us
+          </a>
         </div>
         <div className="flex flex-col">
           <a className="flex mb-2">

@@ -1,256 +1,190 @@
-import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import ToastProps from "../generic/ToastProps";
+import DonationService from "../services/DonationService";
 
-const PaymentDetails = ( ) => {
-    
-    const [payment, setPayment ] = useState({
-        cardFirstName: "",
-        cardLastName: "",
-        cardNumber: "",
-        expMonth: "",
-        expYear: "",
-        CVV: "",
-    
-      
+const PaymentDetails = (props) => {
+  const { setToasts } = props;
+  const { state } = useLocation();
+  const navigate = useNavigate();
+
+  const handleMaxLength = (e) => {
+    if (e.target.value.length > e.target.maxLength) {
+      e.target.value = e.target.value.slice(0, e.target.maxLength);
+    }
+  };
+
+  const handlePaymentDetails = (paymentDetails) => {
+    // Mock checking if payment details are valid with delay
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(true);
+      }, 2000);
+    });
+  };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    const submitButton = e.target.submitButton;
+
+    const firstName = e.target.firstName.value;
+    const lastName = e.target.lastName.value;
+    const cardNumber = e.target.cardNumber.value;
+    const expiryMonth = e.target.expiryMonth.value;
+    const expiryYear = e.target.expiryYear.value;
+    const CVV = e.target.CVV.value;
+
+    const paymentDetails = {
+      firstName,
+      lastName,
+      cardNumber,
+      expiryMonth,
+      expiryYear,
+      CVV,
+    };
+
+    submitButton.classList.add("loading");
+    submitButton.disabled = true;
+    const validate = await handlePaymentDetails(paymentDetails);
+
+    if (!validate) {
+      setToasts((prev) => [
+        ...prev,
+        new ToastProps({
+          type: "error",
+          message: "Invalid payment details! Please try again.",
+        }),
+      ]);
+
+      submitButton.classList.remove("loading");
+      submitButton.disabled = false;
+      return;
+    }
+
+    const details = state;
+
+    try {
+      const response = await DonationService.newDonation(details);
+      const receipt = response.receipt;
+
+      const title = "Thank you for your donation!";
+
+      setToasts((prev) => [
+        ...prev,
+        new ToastProps({
+          type: "success",
+          message: response.msg,
+        }),
+      ]);
+
+      submitButton.classList.remove("loading");
+      submitButton.disabled = false;
+
+      navigate("/thankyou", {
+        state: { title, data: { receipt, paymentDetails }, type: "donation" },
       });
-      const ChangeHandler = (event) => {
-        const target = event.target;
-        const name = target.name;
-        const value = target.type === "radio" ? target.checked : target.value;
+    } catch (error) {
+      const err = error.response.data.msg;
 
-        setPayment({
-            ...payment,
-            [name]: value,
-          });
-      }
+      setToasts((prev) => [
+        ...prev,
+        new ToastProps({
+          type: "error",
+          message: err,
+        }),
+      ]);
 
-      const submitHandler = () => {
-        console.log("");
-        alert("Thank you for your donation");
-      };
-    
-      const handleLink = (path) => {
-        navigate(path);
-      };
-    
+      submitButton.classList.remove("loading");
+      submitButton.disabled = false;
+    }
+  };
 
-      
-    return (
-        <div className="Grid Grid-cols -2 mx-20 my-10 container flex">
-            <div className="flex-block mx-20 my-10">        
-                <div className=" max-w-screen justify-center items-center ">
-                    <h1 className="text-4xl ml-10">
-                        Payment Details
-                    </h1>
-                        <form 
-                        onSubmit={submitHandler}
-                        className="
-                        rounded-md w-[35rem] 
-                        shadow-md 
-                        p-10 
-                        pt-5
-                        my-4 
-                        ring-[1px] 
-                        ring-black 
-                        bg- 
-                        mt-8 
-                        gap-6"
-                        
-                        >
-                            <div className="flex flex-col ">
-                                <label className="mr-4">First Name</label>
-                                <input
-                                type="text"
-                                name="cardFirstName"
-                                className="w-[30rem] input                  
-                                shadow-sm 
-                                bg-gray-50 
-                                border border-gray-300 
-                                text-gray-900 text-sm 
-                                rounded-lg 
-                                focus:ring-blue-500 focus:border-blue-500 
-                                block p-2.5 
-                                dark:bg-gray-700 
-                                dark:border-gray-600 
-                                dark:placeholder-gray-400 
-                                dark:text-white 
-                                dark:focus:ring-blue-500 
-                                dark:focus:border-blue-500 
-                                dark:shadow-sm-light
-                                "
-                                placeholder="Card Holder's First Name"
-                                required
-                                value ={payment.cardFirstName}
-                                onChange={ChangeHandler}
-                             
-                                />
-                            </div>
-                            <div className="flex flex-col pt-5">
-                                <label className="mr-4 pt-3">Last Name</label>
-                                <input
-                                type="text"
-                                name="cardLastName"
-                                className="w-[30rem] input
-                                shadow-sm 
-                                bg-gray-50 
-                                border border-gray-300 
-                                text-gray-900 text-sm 
-                                rounded-lg 
-                                focus:ring-blue-500 focus:border-blue-500 
-                                block p-2.5 
-                                dark:bg-gray-700 
-                                dark:border-gray-600 
-                                dark:placeholder-gray-400 
-                                dark:text-white 
-                                dark:focus:ring-blue-500 
-                                dark:focus:border-blue-500 
-                                dark:shadow-sm-light
-                                "
-                                placeholder="Card Holder's Last Name "
-                                required
-                                value ={payment.cardLastName}
-                                onChange={ChangeHandler}
-                                />
-                            </div>
-                            <div className="flex flex-col pt-5">
-                                <label className="mr-4 pt-3">Card Number</label>
-                                <input
-                                type="text"
-                                name="cardNumber"
-                                className="w-[30rem] input
-                                shadow-sm 
-                                bg-gray-50 
-                                border border-gray-300 
-                                text-gray-900 text-sm 
-                                rounded-lg 
-                                focus:ring-blue-500 focus:border-blue-500 
-                                block p-2.5 
-                                dark:bg-gray-700 
-                                dark:border-gray-600 
-                                dark:placeholder-gray-400 
-                                dark:text-white 
-                                dark:focus:ring-blue-500 
-                                dark:focus:border-blue-500 
-                                dark:shadow-sm-light"
-                                placeholder="Card Number"
-                                required
-                                value ={payment.cardNumber}
-                                onChange={ChangeHandler}
-                                />
-                            
-                            </div>
-                            
-                            <div className="flex flex-col pt-5">
-                                <label className="mr-4 pt-3">Expiry Date</label>
-                                <span>
-                                <input type="text" 
-                                name="expMonth" 
-                                placeholder="MM" 
-                                maxlength="2" 
-                                size="2" 
-                                className="w-[5rem] input
-                                shadow-sm 
-                                bg-gray-50 
-                                border border-gray-300 
-                                text-gray-900 text-sm 
-                                rounded-lg 
-                                focus:ring-blue-500 focus:border-blue-500 
-                                
-                                dark:bg-gray-700 
-                                dark:border-gray-600 
-                                dark:placeholder-gray-400 
-                                dark:text-white 
-                                dark:focus:ring-blue-500 
-                                dark:focus:border-blue-500 
-                                dark:shadow-sm-light
-                                "
-                                value ={payment.expMonth}
-                                onChange={ChangeHandler}
-                                />
-                                <span>/</span>
-                                <input 
-                                type="text" 
-                                name="expYear" 
-                                placeholder="YY" 
-                                maxlength="2" 
-                                size="2" 
-                                className="w-[5rem] input
-                                shadow-sm 
-                                bg-gray-50 
-                                border border-gray-300 
-                                text-gray-900 text-sm 
-                                rounded-lg 
-                                focus:ring-blue-500 focus:border-blue-500 
-                               
-                                dark:bg-gray-700 
-                                dark:border-gray-600 
-                                dark:placeholder-gray-400 
-                                dark:text-white 
-                                dark:focus:ring-blue-500 
-                                dark:focus:border-blue-500 
-                                dark:shadow-sm-light"
-                                
-                                value ={payment.expYear}
-                                onChange={ChangeHandler}/>
-                                </span>
-                                
-                            </div>
-                        
-                            <div className="flex flex-col pt-5">
-                                <label className="mr-4 pt-3">CVV</label>
-                                <input
-                                type="text"
-                                name="CVV"
-                                className="w-[10rem] input
-                                shadow-sm 
-                                bg-gray-50 
-                                border border-gray-300 
-                                text-gray-900 text-sm 
-                                rounded-lg 
-                                focus:ring-blue-500 focus:border-blue-500 
-                                block p-2.5 
-                                dark:bg-gray-700 
-                                dark:border-gray-600 
-                                dark:placeholder-gray-400 
-                                dark:text-white 
-                                dark:focus:ring-blue-500 
-                                dark:focus:border-blue-500 
-                                dark:shadow-sm-light
-                                "
-                                placeholder="CVV"
-                                maxlength="3" size="3"
-                                required
-                                value ={payment.CVV}
-                                onChange={ChangeHandler}
-                                />
-                            </div>
+  return (
+    <div className="flex justify-center items-center">
+      <div className="flex flex-col justify-center items-center w-full m-10 gap-2">
+        <h1 className="text-4xl font-bold">Payment Details</h1>
+        <form
+          onSubmit={submitHandler}
+          className="flex flex-col gap-4 rounded-md shadow-2xl p-10 w-1/3"
+        >
+          <div className="flex flex-col gap-1">
+            <label className="font-bold">First name</label>
+            <input
+              type="text"
+              name="firstName"
+              className="input input-bordered"
+              placeholder="Cardholder's first name"
+              required
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="font-bold">Last name</label>
+            <input
+              type="text"
+              name="lastName"
+              className="input input-bordered"
+              placeholder="Cardholder's last name"
+              required
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="font-bold">Card number</label>
+            <input
+              type="number"
+              name="cardNumber"
+              className="input input-bordered"
+              placeholder="Card number"
+              required
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="font-bold">Expiry date</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  name="expiryMonth"
+                  placeholder="MM"
+                  className="input input-bordered w-[4rem]"
+                  maxLength="2"
+                  onChange={handleMaxLength}
+                />
+                <span className="text-2xl">/</span>
+                <input
+                  type="number"
+                  name="expiryYear"
+                  placeholder="YY"
+                  className="input input-bordered w-[4rem]"
+                  maxLength="2"
+                  onChange={handleMaxLength}
+                />
+              </div>
+            </div>
+            <div className="divider divider-horizontal"></div>
+            <div className="flex flex-col gap-1">
+              <label className="font-bold">CVV</label>
+              <input
+                type="password"
+                name="CVV"
+                className="input input-bordered w-[6rem]"
+                placeholder="CVV"
+                maxLength="3"
+                onChange={handleMaxLength}
+                required
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            name="submitButton"
+            className="btn btn-block mt-2"
+          >
+            Pay
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
 
-                            <div className="flex justify-end pt-10 ">
-                                <button type="submit" className="btn  w-60 btn">
-                                    Pay
-                                </button>
-                            </div>
-
-
-                            
-                        </form>
-                    </div>
-            </div >   
-            <div className=" mx-20 my-10">
-                <h1 className="text-4xl pb-5">
-                    Manage Your Payment
-                </h1>
-                <h3 className="text-xl p-5 py-10">
-                    Edit Payment Details
-                </h3>
-                <h3 className="text-xl p-5 py-10">
-                    SMS Notifications
-                </h3>
-                <h3 className="text-xl p-5 py-10">
-                    Download Payment Receipt 
-                </h3>
-                </div>                
-        </div>
-    )
-}
-
-export default PaymentDetails
+export default PaymentDetails;

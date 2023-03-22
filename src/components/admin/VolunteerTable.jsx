@@ -1,29 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import UserService from "../services/UserService";
+import AdminService from "../services/AdminService";
 
 const VolunteerTable = () => {
-  // const { volunteers, viewVolunteers } = UserService();
   const navigate = useNavigate();
-  // const handleDeletevolunteer = async (volunteerID) => {
-  //   if (window.confirm("Are you sure you want to delete this volunteer?")) {
-  //     const response = await deletevolunteer(volunteerID);
-  //     console.log(response);
-  //     viewVolunteers();
-  //   }
-  // };
+  const [volunteers, setVolunteers] = useState([]);
 
-  // useEffect(() => {
-  //   viewVolunteers();
-  // }, []);
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm("Are you sure you want to delete this volunteer?")) {
+      const response = await AdminService.deleteUser(userId);
+      console.log(response);
+      viewVolunteers();
+    }
+  };
 
-  // useEffect(() => {
-  //   console.log(volunteers);
-  // }, [volunteers]);
+  const viewVolunteers = async () => {
+    try {
+      const users = await AdminService.getUsers();
 
-  // if (volunteers.length === 0) {
-  //   return <p>No volunteers found.</p>;
-  // }
+      setVolunteers(users.volunteers);
+      console.log(users.volunteers);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    viewVolunteers();
+  }, []);
+
+  if (volunteers.length === 0) {
+    return <p>No volunteers found.</p>;
+  }
   const handleLink = (path) => {
     navigate(path);
   };
@@ -49,89 +57,37 @@ const VolunteerTable = () => {
                 <th>Contact Number</th>
                 <th>Available Days</th>
                 <th>Service Provided</th>
-                <th>Password</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {/* {volunteers &&
-                volunteers.map((volunteer) => {
-                  <tr key={volunteer.volunteerID} className="hover">
-                    <th>{volunteer.volunteerID}</th>
-                    <td>{volunteer.volunteerID}</td>
-                    <td>{volunteer.volunteerID}</td>
-                    <td>{volunteer.volunteerID}</td>
-                    <td>{volunteer.volunteerID}</td>
-                    <td>{volunteer.volunteerID}</td>
-                    <td>{volunteer.volunteerID}</td>
-                    <td>{volunteer.volunteerID}</td>
-                    <td>{volunteer.volunteerID}</td>
-                    <td>
-                      <div className="flex flex-col items-center">
-                        <button className="btn btn-primary">
-                          <Link to={`/volunteerValidate/${volunteer.volunteerID}`}>
-                            Validate
-                          </Link>
-                        </button>
-                        <button className="btn btn-secondary">
-                          <Link to={`/updatevolunteer/${volunteer.volunteerID}`}>
-                            Update
-                          </Link>
-                        </button>
-                        <button
-                          className="btn btn-error"
-                          onClick={() => handleDeletevolunteer(volunteer.volunteerID)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>;
-                })} */}
-              <tr>
-                <th>1</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>Littel, Schaden and Vandervort</td>
-                <td>Canada</td>
-                <td>12/16/2020</td>
-                <td>Blue</td>
-                <td>Blue</td>
-                <td>Blue</td>
-                <td>
-                  <div className="flex flex-col items-center">
-                    <button className="btn btn-primary my-2 w-28">
-                      <Link to="/">Validate</Link>
-                    </button>
-                    <button className="btn btn-secondary my-2 w-28">
-                      <Link to="/">Update</Link>
-                    </button>
-                    <button className="btn btn-error my-2 w-28">Delete</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th>2</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>Littel, Schaden and Vandervort</td>
-                <td>Canada</td>
-                <td>12/16/2020</td>
-                <td>Blue</td>
-                <td>Blue</td>
-                <td>Blue</td>
-                <td>
-                  <div className="flex flex-col items-center">
-                    <button className="btn btn-primary my-2 w-28">
-                      <Link to="/">Validate</Link>
-                    </button>
-                    <button className="btn btn-secondary my-2 w-28">
-                      <Link to="/">Update</Link>
-                    </button>
-                    <button className="btn btn-error my-2 w-28">Delete</button>
-                  </div>
-                </td>
-              </tr>
+              {volunteers.map((volunteer) => (
+                <tr key={volunteer._id} className="hover">
+                  <th className="z-0">{volunteer._id}</th>
+                  <td>{volunteer.firstName}</td>
+                  <td>{volunteer.lastName}</td>
+                  <td>{volunteer.emailAddress}</td>
+                  <td>{volunteer.address?.fullAddress}</td>
+                  <td>{volunteer.contactNumber}</td>
+                  <td>{volunteer.daysAvailable?.join(", ")}</td>
+                  <td>{volunteer.serviceType}</td>
+                  <td>
+                    <div className="flex flex-col items-center">
+                      <button className="btn btn-secondary w-24 mb-2">
+                        <Link to={`/admin/volunteerUpdate/${volunteer._id}`}>
+                          Update
+                        </Link>
+                      </button>
+                      <button
+                        className="btn btn-error w-24"
+                        onClick={() => handleDeleteUser(volunteer._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
             <tfoot>
               <tr>
@@ -143,7 +99,6 @@ const VolunteerTable = () => {
                 <th>Contact Number</th>
                 <th>Available Days</th>
                 <th>Service Provided</th>
-                <th>Password</th>
                 <th>Actions</th>
               </tr>
             </tfoot>

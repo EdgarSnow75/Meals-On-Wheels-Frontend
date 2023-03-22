@@ -1,30 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import UserService from "../services/UserService";
+import AdminService from "../services/AdminService";
 
 const PartnerTable = () => {
-  // const { partners, viewPartner } = UserService();
+  const [partners, setPartners] = useState([]);
   const navigate = useNavigate();
 
-  // const handleDeletepartner = async (partnerID) => {
-  //   if (window.confirm("Are you sure you want to delete this partner?")) {
-  //     const response = await deletepartner(partnerID);
-  //     console.log(response);
-  //     viewPartner();
-  //   }
-  // };
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm("Are you sure you want to delete this partner?")) {
+      const response = await AdminService.deleteUser(userId);
+      console.log(response);
+      viewPartners();
+    }
+  };
 
-  // useEffect(() => {
-  //   viewPartner();
-  // }, []);
+  const viewPartners = async () => {
+    try {
+      const users = await AdminService.getUsers();
 
-  // useEffect(() => {
-  //   console.log(partners);
-  // }, [partners]);
+      setPartners(users.partners);
+      console.log(users.partners);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  // if (partners.length === 0) {
-  //   return <p>No partners found.</p>;
-  // }
+  useEffect(() => {
+    viewPartners();
+  }, []);
+
+  if (partners.length === 0) {
+    return <p>No partners found.</p>;
+  }
   const handleLink = (path) => {
     navigate(path);
   };
@@ -49,87 +56,36 @@ const PartnerTable = () => {
                 <th>Contact Number</th>
                 <th>Available Days</th>
                 <th>Service Type</th>
-                <th>Password</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {/* {partners &&
-                partners.map((partner) => {
-                  <tr key={partner.partnerID} className="hover">
-                    <th>{partner.partnerID}</th>
-                    <td>{partner.partnerID}</td>
-                    <td>{partner.partnerID}</td>
-                    <td>{partner.partnerID}</td>
-                    <td>{partner.partnerID}</td>
-                    <td>{partner.partnerID}</td>
-                    <td>{partner.partnerID}</td>
-                    <td>{partner.partnerID}</td>
-                    <td>{partner.partnerID}</td>
-                    <td>
-                      <div className="flex flex-col items-center">
-                        <button className="btn btn-primary">
-                          <Link to={`/partnerValidate/${partner.partnerID}`}>
-                            Validate
-                          </Link>
-                        </button>
-                        <button className="btn btn-secondary">
-                          <Link to={`/updatepartner/${partner.partnerID}`}>
-                            Update
-                          </Link>
-                        </button>
-                        <button
-                          className="btn btn-error"
-                          onClick={() => handleDeletepartner(partner.partnerID)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>;
-                })} */}
-              <tr>
-                <th>1</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>Littel, Schaden and Vandervort</td>
-                <td>Canada</td>
-                <td>12/16/2020</td>
-                <td>Blue</td>
-                <td>Blue</td>
-                <td>
-                  <div className="flex flex-col items-center">
-                    <button className="btn btn-primary my-2 w-28">
-                      <Link to="/">Validate</Link>
-                    </button>
-                    <button className="btn btn-secondary my-2 w-28">
-                      <Link to="/">Update</Link>
-                    </button>
-                    <button className="btn btn-error my-2 w-28">Delete</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th>2</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>Littel, Schaden and Vandervort</td>
-                <td>Canada</td>
-                <td>12/16/2020</td>
-                <td>Blue</td>
-                <td>Blue</td>
-                <td>
-                  <div className="flex flex-col items-center">
-                    <button className="btn btn-primary my-2 w-28">
-                      <Link to="/">Validate</Link>
-                    </button>
-                    <button className="btn btn-secondary my-2 w-28">
-                      <Link to="/">Update</Link>
-                    </button>
-                    <button className="btn btn-error my-2 w-28">Delete</button>
-                  </div>
-                </td>
-              </tr>
+              {partners.map((partner) => (
+                <tr key={partner._id} className="hover">
+                  <th className="z-0">{partner._id}</th>
+                  <td>{partner.businessName}</td>
+                  <td>{partner.emailAddress}</td>
+                  <td>{partner.address?.fullAddress}</td>
+                  <td>{partner.contactNumber}</td>
+                  <td>{partner.daysAvailable?.join(", ")}</td>
+                  <td>{partner.serviceType}</td>
+                  <td>
+                    <div className="flex flex-col items-center">
+                      <button className="btn btn-secondary w-24 mb-2">
+                        <Link to={`/admin/partnerUpdate/${partner._id}`}>
+                          Update
+                        </Link>
+                      </button>
+                      <button
+                        className="btn btn-error w-24"
+                        onClick={() => handleDeleteUser(partner._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
             <tfoot>
               <tr>
@@ -140,7 +96,6 @@ const PartnerTable = () => {
                 <th>Contact Number</th>
                 <th>Available Days</th>
                 <th>Service Type</th>
-                <th>Password</th>
                 <th>Actions</th>
               </tr>
             </tfoot>

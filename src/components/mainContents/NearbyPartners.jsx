@@ -56,9 +56,13 @@ export default function NearbyPartners() {
         <span className="italic">{address}</span>
       </h3>
       <div className="nearby-partners my-4 flex flex-row flex-wrap">
-        {partners.map((partner) => (
-          <PartnerCard key={partner._id} partner={partner} />
-        ))}
+        {partners?.length ? (
+          partners.map((partner) => (
+            <PartnerCard key={partner._id} partner={partner} />
+          ))
+        ) : (
+          <div>No partners found!</div>
+        )}
       </div>
     </div>
   );

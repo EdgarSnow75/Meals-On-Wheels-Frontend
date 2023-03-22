@@ -6,7 +6,7 @@ import PartnerForm from "./PartnerForm";
 import VolunteerForm from "./VolunteerForm";
 
 const UserRegister = (props) => {
-  const { isLoggedIn, userType } = props;
+  const { isLoggedIn, userType, setToasts } = props;
   const navigate = useNavigate();
   const [form, setForm] = useState("Member");
 
@@ -16,7 +16,7 @@ const UserRegister = (props) => {
         case "member":
           navigate("/memberProfile");
           break;
-        case "caretaker":
+        case "caregiver":
           navigate("/caretakerProfile");
           break;
         case "partner":
@@ -35,7 +35,6 @@ const UserRegister = (props) => {
   const onChangeHandler = (event) => {
     const target = event.target;
     setForm(target.value);
-    console.log(form);
   };
 
   return (
@@ -54,10 +53,10 @@ const UserRegister = (props) => {
             <option value="Volunteer">Volunteer</option>
           </select>
         </div>
-        {form === "Member" && <MemberRegisterFrom />}
-        {form === "Caretaker" && <CareTakerForm />}
-        {form === "Partner" && <PartnerForm />}
-        {form === "Volunteer" && <VolunteerForm />}
+        {form === "Member" && <MemberRegisterFrom setToasts={setToasts} />}
+        {form === "Caretaker" && <CareTakerForm setToasts={setToasts} />}
+        {form === "Partner" && <PartnerForm setToasts={setToasts} />}
+        {form === "Volunteer" && <VolunteerForm setToasts={setToasts} />}
       </div>
     </div>
   );

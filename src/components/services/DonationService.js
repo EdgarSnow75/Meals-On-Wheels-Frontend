@@ -19,7 +19,7 @@ class DonationService {
         donorName,
         donationType,
         emailAddress,
-        amount,
+        amount: parseFloat(amount),
         paymentMethod,
         comment,
       },

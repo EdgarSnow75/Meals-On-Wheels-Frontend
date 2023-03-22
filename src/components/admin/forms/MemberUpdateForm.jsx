@@ -1,40 +1,42 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../../generic/BackButton";
-import VolunteerService from "../../services/VolunteerService";
+import MemberService from "../../services/MemberService";
 import ToastProps from "../../generic/ToastProps";
+import AdminService from "../../services/AdminService";
 
-const VolunteerProfileUpdate = (props) => {
-  const { isLoggedIn, userDetails, setToasts } = props;
-  const [volunteer, setVolunteer] = useState({
+const MemberUpdateForm = (props) => {
+  const { id } = useParams();
+  const { setToasts } = props;
+  const [member, setMember] = useState({
+    _id: "",
     firstName: "",
     lastName: "",
+    birthdate: "",
     emailAddress: "",
     address: "",
     contactNumber: "",
-    daysAvailable: "",
-    serviceProvided: "",
+    dietaryRestrictions: "",
+    foodAllergies: "",
   });
 
+  const [isAllergic, setIsAllergic] = useState(false);
   const navigate = useNavigate();
-  const [isAllDaysChecked, setIsAllDaysChecked] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/userLogin");
-    } else {
-      setVolunteer({
-        firstName: userDetails.firstName,
-        lastName: userDetails.lastName,
-        emailAddress: userDetails.emailAddress,
-        address: userDetails.address.fullAddress,
-        contactNumber: userDetails.contactNumber,
-        daysAvailable: userDetails.daysAvailable,
-        serviceProvided: userDetails.serviceProvided,
+    async function fetchUser() {
+      const userData = await AdminService.getUser(id);
+
+      setMember({
+        ...userData,
+        address: userData.address.fullAddress,
+        birthdate: userData.birthdate.slice(0, 10),
       });
     }
-  }, [isLoggedIn, userDetails]);
+    fetchUser();
+  }, [id]);
 
+  // Check checkbox if dietary restriction is present using useEffect
   useEffect(() => {
     const updateProfileForm = document.getElementById("updateProfileForm");
     const checkboxes = updateProfileForm.querySelectorAll(
@@ -42,11 +44,15 @@ const VolunteerProfileUpdate = (props) => {
     );
 
     checkboxes.forEach((checkbox) => {
-      if (volunteer.daysAvailable.includes(checkbox.name)) {
+      if (member.dietaryRestrictions.includes(checkbox.name)) {
         checkbox.checked = true;
       }
+
+      if (member.foodAllergies?.length > 0) {
+        setIsAllergic(true);
+      }
     });
-  }, [volunteer]);
+  }, [member]);
 
   const inputChangeHandler = (event) => {
     const target = event.target;
@@ -54,59 +60,62 @@ const VolunteerProfileUpdate = (props) => {
     const value = target.type === "checkbox" ? target.checked : target.value;
 
     if (target.type === "checkbox") {
-      // Get the current list of dietary days
-      let days = volunteer.daysAvailable || [];
+      // Get the current list of dietary restrictions
+      let restrictions = member.dietaryRestrictions || [];
 
       if (value) {
         // If the checkbox is checked, add the value to the list
-        days.push(name);
+        restrictions.push(name);
       } else {
         // If the checkbox is unchecked, remove the value from the list
-        const index = days.indexOf(name);
+        const index = restrictions.indexOf(name);
         if (index !== -1) {
-          days = [...days.slice(0, index), ...days.slice(index + 1)];
+          restrictions = [
+            ...restrictions.slice(0, index),
+            ...restrictions.slice(index + 1),
+          ];
         }
       }
+      if (name === "foodAllergic" && !checked) {
+        member.foodAllergies = [];
+      }
 
-      // Update the volunteer with the new list of dietary days
-      setVolunteer({
-        ...volunteer,
-        daysAvailable: days,
+      // Update the member with the new list of dietary restrictions
+      setMember({
+        ...member,
+        dietaryRestrictions: restrictions,
       });
     } else {
-      // For other input types, update the volunteer with the new value
-      setVolunteer({
-        ...volunteer,
+      // For food allergies
+      if (name === "foodAllergies") {
+        // Get the current list of food allergies
+        return setMember({
+          ...member,
+          foodAllergies: value.split(",").map((item) => item.trim()),
+        });
+      }
+
+      // For other input types, update the member with the new value
+      setMember({
+        ...member,
         [name]: value,
       });
     }
   };
 
-  const handleAllDaysChange = (event) => {
-    const isChecked = event.target.checked;
-    setIsAllDaysChecked(isChecked);
-
-    const newDaysAvailable = isChecked
-      ? [
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday",
-          "saturday",
-          "sunday",
-        ]
-      : [];
-    setVolunteer((prevVolunteer) => ({
-      ...prevVolunteer,
-      daysAvailable: newDaysAvailable,
-    }));
+  const hiddenInputHandler = (event) => {
+    if (event.target.checked) {
+      setIsAllergic(true);
+    } else {
+      setIsAllergic(false);
+    }
   };
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await VolunteerService.update(volunteer);
+      const response = await AdminService.updateUser(member, id);
       setToasts((toasts) => [
         ...toasts,
         new ToastProps({ message: response.msg }),
@@ -132,167 +141,202 @@ const VolunteerProfileUpdate = (props) => {
         </h2>
         <div className="rounded-md w-[35rem] shadow-md p-10 pt-2 my-4 ring-[0.5px] ring-[rgba(0,0,0,0.2) bg-accent">
           <form
-            onSubmit={submitHandler}
             id="updateProfileForm"
+            onSubmit={submitHandler}
             className="mt-8 max-w-md grid grid-cols-1 gap-6"
           >
             <div className="flex flex-col">
-              <label className="mb-1 mr-4">First Name</label>
+              <label className="mr-4">First Name</label>
               <input
                 type="text"
                 name="firstName"
                 className="w-[30rem] input text-black"
                 placeholder="First Name"
-                value={volunteer.firstName}
+                value={member.firstName}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 mr-4">Last Name</label>
+              <label className="mr0-4">Last Name</label>
               <input
                 type="text"
                 name="lastName"
                 className="w-[30rem] input text-black"
                 placeholder="Last Name"
-                value={volunteer.lastName}
+                value={member.lastName}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 mr-4">Email Address</label>
+              <label className="mr0-4">Birthday</label>
+              <input
+                type="date"
+                name="birthdate"
+                className="w-[30rem] input text-black"
+                placeholder="Birthday"
+                value={member.birthdate}
+                onChange={inputChangeHandler}
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="mr-4">Email Address</label>
               <input
                 type="email"
                 name="emailAddress"
                 className="w-[30rem] input text-black"
                 placeholder="Email"
-                value={volunteer.emailAddress}
+                value={member.emailAddress}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 mr-4">Full Address</label>
+              <label className="mr-4">Full Address</label>
               <input
                 type="text"
                 name="address"
                 className="w-[30rem] input text-black"
                 placeholder="Address:"
-                value={volunteer.address}
+                value={member.address}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 mr-4">Contact Number</label>
+              <label className="mr-4">Contact Number</label>
               <input
                 type="text"
                 name="contactNumber"
                 className="w-[30rem] input text-black"
                 placeholder="Contact"
-                value={volunteer.contactNumber}
+                value={member.contactNumber}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 mr-4">Available Days</label>
+              <label className="mr-4">Dietary Restrictions</label>
               <div className="grid grid-cols-3 gap-6">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="Monday"
+                    name="vegetarian"
                     className="mr-2 checkbox-secondary"
-                    checked={volunteer.daysAvailable?.includes("monday")}
+                    checked={member.dietaryRestrictions?.includes("vegetarian")}
                     onChange={inputChangeHandler}
                   />
-                  Monday
+                  Vegetarian
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="Tuesday"
+                    name="halal"
                     className="mr-2 checkbox-secondary"
-                    checked={volunteer.daysAvailable?.includes("tuesday")}
+                    checked={member.dietaryRestrictions?.includes("halal")}
                     onChange={inputChangeHandler}
                   />
-                  Tuesday
+                  Halal
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="Wednesday"
+                    name="glutenFree"
                     className="mr-2 checkbox-secondary"
-                    checked={volunteer.daysAvailable?.includes("wednesday")}
+                    checked={member.dietaryRestrictions?.includes("glutenFree")}
                     onChange={inputChangeHandler}
                   />
-                  Wednesday
+                  Gluten-free
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="Thursday"
+                    name="lowCalories"
                     className="mr-2 checkbox-secondary"
-                    checked={volunteer.daysAvailable?.includes("thursday")}
+                    checked={member.dietaryRestrictions?.includes(
+                      "lowCalories"
+                    )}
                     onChange={inputChangeHandler}
                   />
-                  Thursday
+                  Low Calories
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="Friday"
+                    name="lowCrab"
                     className="mr-2 checkbox-secondary"
-                    checked={volunteer.daysAvailable?.includes("friday")}
+                    checked={member.dietaryRestrictions?.includes("lowCrab")}
                     onChange={inputChangeHandler}
                   />
-                  Friday
+                  Low Crab
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="Saturday"
+                    name="vegan"
                     className="mr-2 checkbox-secondary"
-                    checked={volunteer.daysAvailable?.includes("saturday")}
+                    checked={member.dietaryRestrictions?.includes("vegan")}
                     onChange={inputChangeHandler}
                   />
-                  Saturday
+                  Vegan
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="Sunday"
+                    name="kosher"
                     className="mr-2 checkbox-secondary"
-                    checked={volunteer.daysAvailable?.includes("sunday")}
+                    checked={member.dietaryRestrictions?.includes("kosher")}
                     onChange={inputChangeHandler}
                   />
-                  Sunday
+                  Kosher
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
+                    name="lactoseIntolerant"
                     className="mr-2 checkbox-secondary"
-                    checked={isAllDaysChecked}
-                    onChange={handleAllDaysChange}
+                    checked={member.dietaryRestrictions?.includes(
+                      "lactoseIntolerant"
+                    )}
+                    onChange={inputChangeHandler}
                   />
-                  All Days
+                  Lactose Intolerant
                 </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="foodAllergic"
+                    className="mr-2 checkbox-primary"
+                    checked={isAllergic}
+                    onChange={hiddenInputHandler}
+                  />
+                  Food Allergies
+                </label>
+                {isAllergic && (
+                  <label className="">
+                    <input
+                      type="text"
+                      name="foodAllergies"
+                      className="w-[30rem] input text-black"
+                      value={member.foodAllergies}
+                      onChange={inputChangeHandler}
+                      placeholder="Please specify your food allergies"
+                    />
+                  </label>
+                )}
               </div>
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 mr-4">Select your Service Type</label>
-              <select
-                name="serviceProvided"
-                className="w-[30rem] input text-black"
-                value={volunteer.serviceProvided}
-                onChange={inputChangeHandler}
-                required
-              >
-                <option value="">Select Service Type</option>
-                <option value="delivery">Delivery</option>
-                <option value="logistics">Logistics</option>
-              </select>
+              <label className="mr-4 mb-2">New Medical History Document</label>
+              <input
+                type="file"
+                name="file"
+                className="file:py-2 file:px-4 file:rounded-full file:border-0 file:text-md file:font-semibold
+              file:bg-primary file:text-white
+              hover:file:bg-primary-focus"
+              />
             </div>
             <div className="flex justify-center items-center">
               <BackButton />
@@ -306,4 +350,4 @@ const VolunteerProfileUpdate = (props) => {
     </div>
   );
 };
-export default VolunteerProfileUpdate;
+export default MemberUpdateForm;

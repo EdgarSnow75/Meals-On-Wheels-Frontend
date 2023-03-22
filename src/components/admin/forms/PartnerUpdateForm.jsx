@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../../generic/BackButton";
 import PartnerService from "../../services/PartnerService";
 import { useEffect } from "react";
 import ToastProps from "../../generic/ToastProps";
+import AdminService from "../../services/AdminService";
 
-const PartnerProfileUpdate = (props) => {
-  const { isLoggedIn, userDetails, setToasts } = props;
+const PartnerUpdateForm = (props) => {
+  const { id } = useParams();
+  const { setToasts } = props;
   const [partner, setPartner] = useState({
+    _id: "",
     businessName: "",
     emailAddress: "",
     address: "",
@@ -20,19 +23,16 @@ const PartnerProfileUpdate = (props) => {
   const [isAllDaysChecked, setIsAllDaysChecked] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/userLogin");
-    } else {
+    async function fetchUser() {
+      const userData = await AdminService.getUser(id);
+
       setPartner({
-        businessName: userDetails.businessName,
-        emailAddress: userDetails.emailAddress,
-        address: userDetails.address.fullAddress,
-        contactNumber: userDetails.contactNumber,
-        daysAvailable: userDetails.daysAvailable,
-        serviceProvided: userDetails.serviceProvided,
+        ...userData,
+        address: userData.address.fullAddress,
       });
     }
-  }, [isLoggedIn, userDetails]);
+    fetchUser();
+  }, [id]);
 
   const inputChangeHandler = (event) => {
     const target = event.target;
@@ -105,7 +105,7 @@ const PartnerProfileUpdate = (props) => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const response = await PartnerService.update(partner);
+      const response = await AdminService.updateUser(partner, id);
       setToasts((toasts) => [
         ...toasts,
         new ToastProps({ message: response.msg }),
@@ -307,4 +307,4 @@ const PartnerProfileUpdate = (props) => {
     </div>
   );
 };
-export default PartnerProfileUpdate;
+export default PartnerUpdateForm;

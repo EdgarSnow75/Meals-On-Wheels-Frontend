@@ -1,38 +1,51 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../../generic/BackButton";
-import PartnerService from "../../services/PartnerService";
-import { useEffect } from "react";
+import VolunteerService from "../../services/VolunteerService";
 import ToastProps from "../../generic/ToastProps";
+import AdminService from "../../services/AdminService";
 
-const PartnerProfileUpdate = (props) => {
-  const { isLoggedIn, userDetails, setToasts } = props;
-  const [partner, setPartner] = useState({
-    businessName: "",
+const VolunteerUpdateForm = (props) => {
+  const { id } = useParams();
+  const { setToasts } = props;
+  const [volunteer, setVolunteer] = useState({
+    _id: "",
+    firstName: "",
+    lastName: "",
     emailAddress: "",
     address: "",
     contactNumber: "",
     daysAvailable: "",
-    serviceType: "",
+    serviceProvided: "",
   });
 
   const navigate = useNavigate();
   const [isAllDaysChecked, setIsAllDaysChecked] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/userLogin");
-    } else {
-      setPartner({
-        businessName: userDetails.businessName,
-        emailAddress: userDetails.emailAddress,
-        address: userDetails.address.fullAddress,
-        contactNumber: userDetails.contactNumber,
-        daysAvailable: userDetails.daysAvailable,
-        serviceProvided: userDetails.serviceProvided,
+    async function fetchUser() {
+      const userData = await AdminService.getUser(id);
+
+      setVolunteer({
+        ...userData,
+        address: userData.address.fullAddress,
       });
     }
-  }, [isLoggedIn, userDetails]);
+    fetchUser();
+  }, [id]);
+
+  useEffect(() => {
+    const updateProfileForm = document.getElementById("updateProfileForm");
+    const checkboxes = updateProfileForm.querySelectorAll(
+      "input[type=checkbox]"
+    );
+
+    checkboxes.forEach((checkbox) => {
+      if (volunteer.daysAvailable.includes(checkbox.name)) {
+        checkbox.checked = true;
+      }
+    });
+  }, [volunteer]);
 
   const inputChangeHandler = (event) => {
     const target = event.target;
@@ -41,7 +54,7 @@ const PartnerProfileUpdate = (props) => {
 
     if (target.type === "checkbox") {
       // Get the current list of dietary days
-      let days = partner.daysAvailable || [];
+      let days = volunteer.daysAvailable || [];
 
       if (value) {
         // If the checkbox is checked, add the value to the list
@@ -54,32 +67,19 @@ const PartnerProfileUpdate = (props) => {
         }
       }
 
-      // Update the partner with the new list of dietary days
-      setPartner({
-        ...partner,
+      // Update the volunteer with the new list of dietary days
+      setVolunteer({
+        ...volunteer,
         daysAvailable: days,
       });
     } else {
-      // For other input types, update the partner with the new value
-      setPartner({
-        ...partner,
+      // For other input types, update the volunteer with the new value
+      setVolunteer({
+        ...volunteer,
         [name]: value,
       });
     }
   };
-
-  useEffect(() => {
-    const updateProfileForm = document.getElementById("updateProfileForm");
-    const checkboxes = updateProfileForm.querySelectorAll(
-      "input[type=checkbox]"
-    );
-
-    checkboxes.forEach((checkbox) => {
-      if (partner.daysAvailable.includes(checkbox.name)) {
-        checkbox.checked = true;
-      }
-    });
-  }, [partner]);
 
   const handleAllDaysChange = (event) => {
     const isChecked = event.target.checked;
@@ -96,8 +96,8 @@ const PartnerProfileUpdate = (props) => {
           "sunday",
         ]
       : [];
-    setPartner((prevPartner) => ({
-      ...prevPartner,
+    setVolunteer((prevVolunteer) => ({
+      ...prevVolunteer,
       daysAvailable: newDaysAvailable,
     }));
   };
@@ -105,7 +105,7 @@ const PartnerProfileUpdate = (props) => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const response = await PartnerService.update(partner);
+      const response = await AdminService.updateUser(volunteer, id);
       setToasts((toasts) => [
         ...toasts,
         new ToastProps({ message: response.msg }),
@@ -127,71 +127,83 @@ const PartnerProfileUpdate = (props) => {
     <div>
       <div className="text-white flex flex-col items-center">
         <h2 className="font-bold text-4xl text-black my-4">
-          Update your business details
+          Update your profile
         </h2>
         <div className="rounded-md w-[35rem] shadow-md p-10 pt-2 my-4 ring-[0.5px] ring-[rgba(0,0,0,0.2) bg-accent">
           <form
             onSubmit={submitHandler}
-            className="mt-8 max-w-md grid grid-cols-1 gap-6"
             id="updateProfileForm"
+            className="mt-8 max-w-md grid grid-cols-1 gap-6"
           >
             <div className="flex flex-col">
-              <label className="mr-4">Business Name</label>
+              <label className="mb-1 mr-4">First Name</label>
               <input
                 type="text"
-                name="businessName"
+                name="firstName"
                 className="w-[30rem] input text-black"
-                placeholder="Business Name"
-                value={partner.businessName}
+                placeholder="First Name"
+                value={volunteer.firstName}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Email Address</label>
+              <label className="mb-1 mr-4">Last Name</label>
+              <input
+                type="text"
+                name="lastName"
+                className="w-[30rem] input text-black"
+                placeholder="Last Name"
+                value={volunteer.lastName}
+                onChange={inputChangeHandler}
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-1 mr-4">Email Address</label>
               <input
                 type="email"
                 name="emailAddress"
                 className="w-[30rem] input text-black"
                 placeholder="Email"
-                value={partner.emailAddress}
+                value={volunteer.emailAddress}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Full Address</label>
+              <label className="mb-1 mr-4">Full Address</label>
               <input
                 type="text"
                 name="address"
                 className="w-[30rem] input text-black"
                 placeholder="Address:"
-                value={partner.address}
+                value={volunteer.address}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Contact Number</label>
+              <label className="mb-1 mr-4">Contact Number</label>
               <input
                 type="text"
                 name="contactNumber"
                 className="w-[30rem] input text-black"
                 placeholder="Contact"
-                value={partner.contactNumber}
+                value={volunteer.contactNumber}
                 onChange={inputChangeHandler}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mr-4">Available Days</label>
+              <label className="mb-1 mr-4">Available Days</label>
               <div className="grid grid-cols-3 gap-6">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="monday"
+                    name="Monday"
                     className="mr-2 checkbox-secondary"
-                    checked={partner.daysAvailable?.includes("monday")}
+                    checked={volunteer.daysAvailable?.includes("monday")}
                     onChange={inputChangeHandler}
                   />
                   Monday
@@ -199,9 +211,9 @@ const PartnerProfileUpdate = (props) => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="tuesday"
+                    name="Tuesday"
                     className="mr-2 checkbox-secondary"
-                    checked={partner.daysAvailable?.includes("tuesday")}
+                    checked={volunteer.daysAvailable?.includes("tuesday")}
                     onChange={inputChangeHandler}
                   />
                   Tuesday
@@ -209,9 +221,9 @@ const PartnerProfileUpdate = (props) => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="wednesday"
+                    name="Wednesday"
                     className="mr-2 checkbox-secondary"
-                    checked={partner.daysAvailable?.includes("wednesday")}
+                    checked={volunteer.daysAvailable?.includes("wednesday")}
                     onChange={inputChangeHandler}
                   />
                   Wednesday
@@ -219,9 +231,9 @@ const PartnerProfileUpdate = (props) => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="thursday"
+                    name="Thursday"
                     className="mr-2 checkbox-secondary"
-                    checked={partner.daysAvailable?.includes("thursday")}
+                    checked={volunteer.daysAvailable?.includes("thursday")}
                     onChange={inputChangeHandler}
                   />
                   Thursday
@@ -229,9 +241,9 @@ const PartnerProfileUpdate = (props) => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="friday"
+                    name="Friday"
                     className="mr-2 checkbox-secondary"
-                    checked={partner.daysAvailable?.includes("friday")}
+                    checked={volunteer.daysAvailable?.includes("friday")}
                     onChange={inputChangeHandler}
                   />
                   Friday
@@ -239,9 +251,9 @@ const PartnerProfileUpdate = (props) => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="saturday"
+                    name="Saturday"
                     className="mr-2 checkbox-secondary"
-                    checked={partner.daysAvailable?.includes("saturday")}
+                    checked={volunteer.daysAvailable?.includes("saturday")}
                     onChange={inputChangeHandler}
                   />
                   Saturday
@@ -249,9 +261,9 @@ const PartnerProfileUpdate = (props) => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    name="sunday"
+                    name="Sunday"
                     className="mr-2 checkbox-secondary"
-                    checked={partner.daysAvailable?.includes("sunday")}
+                    checked={volunteer.daysAvailable?.includes("sunday")}
                     onChange={inputChangeHandler}
                   />
                   Sunday
@@ -268,31 +280,17 @@ const PartnerProfileUpdate = (props) => {
               </div>
             </div>
             <div className="flex flex-col">
-              <label className="mr-4 mb-2">Business License Document</label>
-              <input
-                type="file"
-                name="file"
-                className="file:py-2 file:px-4 file:rounded-full file:border-0 file:text-md file:font-semibold
-                file:bg-primary file:text-white
-                hover:file:bg-primary-focus"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="mr-4">Select your Service Type</label>
+              <label className="mb-1 mr-4">Select your Service Type</label>
               <select
-                name="serviceType"
+                name="serviceProvided"
                 className="w-[30rem] input text-black"
-                value={partner.serviceType}
+                value={volunteer.serviceProvided}
                 onChange={inputChangeHandler}
                 required
               >
                 <option value="">Select Service Type</option>
-                <option value="restraurant">
-                  Restaurant (Hot and Frozen meals)
-                </option>
-                <option value="grocery">
-                  Grocery (Ingredients and Frozen goods)
-                </option>
+                <option value="delivery">Delivery</option>
+                <option value="logistics">Logistics</option>
               </select>
             </div>
             <div className="flex justify-center items-center">
@@ -307,4 +305,4 @@ const PartnerProfileUpdate = (props) => {
     </div>
   );
 };
-export default PartnerProfileUpdate;
+export default VolunteerUpdateForm;

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ToastProps from "../generic/ToastProps";
 import LocationService from "../services/LocationService";
 import MemberService from "../services/MemberService";
 
-const MemberRegisterFrom = () => {
+const MemberRegisterFrom = (props) => {
+  const { setToasts } = props;
   const [restrictions, setRestrictions] = useState([]);
   const [allergies, setAllergies] = useState("");
 
@@ -12,8 +14,6 @@ const MemberRegisterFrom = () => {
 
   const foodAllergyHandler = (event) => {
     const value = event.target.value;
-
-    console.log(value);
 
     setAllergies(value);
   };
@@ -62,19 +62,35 @@ const MemberRegisterFrom = () => {
     const foodAllergies = allergies.split(",") || [];
     const password = e.target.password?.value;
 
-    const response = await MemberService.signup({
-      firstName,
-      lastName,
-      birthdate,
-      emailAddress,
-      address,
-      contactNumber,
-      dietaryRestrictions,
-      foodAllergies,
-      password,
-    });
+    try {
+      const response = await MemberService.signup({
+        firstName,
+        lastName,
+        birthdate,
+        emailAddress,
+        address,
+        contactNumber,
+        dietaryRestrictions,
+        foodAllergies,
+        password,
+      });
 
-    console.log(response);
+      setToasts((prev) => [...prev, new ToastProps({ message: response.msg })]);
+
+      navigate("/thankyou", {
+        state: {
+          title: "Thank you for signing up!",
+          data: { firstName, lastName, emailAddress },
+          type: "signup",
+        },
+      });
+    } catch (error) {
+      const err = error.response.data.msg;
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ type: "error", message: err }),
+      ]);
+    }
   };
 
   const handleLink = (path) => {
@@ -164,6 +180,7 @@ const MemberRegisterFrom = () => {
                 required
               />
               <button
+                type="button"
                 className="btn btn-square btn-primary"
                 onClick={handleGeoLocation}
               >

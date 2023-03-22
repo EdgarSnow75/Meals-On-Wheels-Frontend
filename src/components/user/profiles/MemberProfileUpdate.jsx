@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../../generic/BackButton";
 import MemberService from "../../services/MemberService";
+import ToastProps from "../../generic/ToastProps";
 
 const MemberProfileUpdate = (props) => {
-  const { isLoggedIn, userDetails } = props;
+  const { isLoggedIn, userDetails, setToasts } = props;
   const [member, setMember] = useState({
     firstName: "",
     lastName: "",
@@ -116,8 +117,16 @@ const MemberProfileUpdate = (props) => {
 
     try {
       const response = await MemberService.update(member);
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ message: response.msg }),
+      ]);
     } catch (error) {
-      console.log(error);
+      const err = error.response.data.msg;
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ type: "error", message: err }),
+      ]);
     }
   };
 
@@ -189,7 +198,7 @@ const MemberProfileUpdate = (props) => {
               <label className="mr-4">Full Address</label>
               <input
                 type="text"
-                name="userAddress"
+                name="address"
                 className="w-[30rem] input text-black"
                 placeholder="Address:"
                 value={member.address}
@@ -329,22 +338,6 @@ const MemberProfileUpdate = (props) => {
               file:bg-primary file:text-white
               hover:file:bg-primary-focus"
               />
-            </div>
-            <div>
-              <label className="mr-4 flex items-center">
-                <input
-                  type="checkbox"
-                  className="mr-2 checkbox-secondary"
-                  required
-                />
-                By signing up, you agree to our
-                <a
-                  onClick={() => handleLink("/privacyPolicy")}
-                  className="link link-primary ml-1"
-                >
-                  Terms & Conditions
-                </a>
-              </label>
             </div>
             <div className="flex justify-center items-center">
               <BackButton />

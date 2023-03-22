@@ -1,10 +1,17 @@
 import userService from "../services/UserService";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import ToastProps from "../generic/ToastProps";
 
 const UserLogin = (props) => {
-  const { isLoggedIn, setIsLoggedIn, setUserType, setUserDetails, userType } =
-    props;
+  const {
+    isLoggedIn,
+    setIsLoggedIn,
+    setUserType,
+    setUserDetails,
+    userType,
+    setToasts,
+  } = props;
 
   const navigate = useNavigate();
 
@@ -14,7 +21,7 @@ const UserLogin = (props) => {
         case "member":
           navigate("/memberProfile");
           break;
-        case "caretaker":
+        case "caregiver":
           navigate("/caretakerProfile");
           break;
         case "partner":
@@ -41,14 +48,35 @@ const UserLogin = (props) => {
       password,
     };
 
-    const { userType } = await userService.login(credentials);
+    try {
+      const { userType } = await userService.login(credentials);
+      setUserType(userType);
 
-    setUserType(userType);
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ message: "Login successful" }),
+      ]);
+    } catch (error) {
+      const err = error.response.data.msg;
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ type: "error", message: err }),
+      ]);
+      return;
+    }
 
-    const userDetails = await userService.getUserDetails();
+    try {
+      const userDetails = await userService.getUserDetails();
+      setUserDetails(userDetails);
 
-    setUserDetails(userDetails);
-    setIsLoggedIn(true);
+      setIsLoggedIn(true);
+    } catch (error) {
+      const err = error.response.data.msg;
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ type: "error", message: err }),
+      ]);
+    }
   }
 
   return (

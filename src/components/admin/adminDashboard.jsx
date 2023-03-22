@@ -1,18 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ToastProps from "../generic/ToastProps";
 import AdminDeliveryControl from "./AdminDeliveryControl";
-import AdminDonationControl from "./AdminDonationControl";
 import AdminReportControl from "./AdminReportControl";
 import AdminScheduleControl from "./AdminScheduleControl";
 import AdminUserControl from "./AdminUserControl";
 
-const AdminDashBoard = () => {
+const AdminDashBoard = (props) => {
+  const { isLoggedIn, userDetails, setToasts } = props;
+  const navigate = useNavigate();
   const [tab, setTab] = useState("Users");
+
+  useEffect(() => {
+    if (!isLoggedIn || userDetails.userType !== "admin") {
+      navigate("/userLogin");
+    }
+  }, [isLoggedIn, userDetails]);
 
   const onChangeHandler = (event) => {
     const target = event.target;
     setTab(target.value);
-    console.log(tab);
   };
+
   return (
     <div>
       <div className="flex flex-col justify-center align-middle items-center">
@@ -31,14 +40,12 @@ const AdminDashBoard = () => {
             <option value="Users">Users</option>
             <option value="Schedules">Schedules</option>
             <option value="Deliveries">Deliveries</option>
-            <option value="Donations">Donations</option>
             <option value="Reports">Reports</option>
           </select>
         </div>
         {tab === "Users" && <AdminUserControl />}
-        {tab === "Schedules" && <AdminScheduleControl />}
-        {tab === "Deliveries" && <AdminDeliveryControl />}
-        {tab === "Donations" && <AdminDonationControl />}
+        {tab === "Schedules" && <AdminScheduleControl setToasts={setToasts} />}
+        {tab === "Deliveries" && <AdminDeliveryControl setToasts={setToasts} />}
         {tab === "Reports" && <AdminReportControl />}
       </div>
     </div>

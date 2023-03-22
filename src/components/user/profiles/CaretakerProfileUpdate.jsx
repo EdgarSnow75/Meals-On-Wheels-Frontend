@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../../generic/BackButton";
+import CaregiverService from "../../services/CaregiverService";
+import ToastProps from "../../generic/ToastProps";
 
-const CaretakerProfileUpdate = () => {
+const CaretakerProfileUpdate = (props) => {
+  const { isLoggedIn, userDetails, setToasts } = props;
   const [caretaker, setCaretaker] = useState({
     firstName: "",
     lastName: "",
@@ -26,6 +29,51 @@ const CaretakerProfileUpdate = () => {
 
   const [isAllergic, setIsAllergic] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/userLogin");
+    } else {
+      setCaretaker({
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        emailAddress: userDetails.emailAddress,
+        address: userDetails.address?.fullAddress,
+        contactNumber: userDetails.contactNumber,
+        relationshipToMember: userDetails.relationshipToMember,
+        password: userDetails.password,
+      });
+
+      setMember({
+        firstName: userDetails.dependentMember.firstName,
+        lastName: userDetails.dependentMember.lastName,
+        birthdate: userDetails.dependentMember.birthdate.slice(0, 10),
+        emailAddress: userDetails.dependentMember.emailAddress,
+        address: userDetails.dependentMember.address?.fullAddress,
+        contactNumber: userDetails.dependentMember.contactNumber,
+        dietaryRestrictions: userDetails.dependentMember.dietaryRestrictions,
+        foodAllergies: userDetails.dependentMember.foodAllergies,
+      });
+    }
+  }, [isLoggedIn, userDetails]);
+
+  // Check checkbox if dietary restriction is present using useEffect
+  useEffect(() => {
+    const updateProfileForm = document.getElementById("updateProfileForm");
+    const checkboxes = updateProfileForm.querySelectorAll(
+      "input[type=checkbox]"
+    );
+
+    checkboxes.forEach((checkbox) => {
+      if (member.dietaryRestrictions.includes(checkbox.name)) {
+        checkbox.checked = true;
+      }
+
+      if (member.foodAllergies?.length > 0) {
+        setIsAllergic(true);
+      }
+    });
+  }, [member]);
 
   const inputChangeHandler = (event) => {
     const target = event.target;
@@ -86,9 +134,26 @@ const CaretakerProfileUpdate = () => {
     }
   };
 
-  const submitHandler = () => {
-    console.log("hi");
-    alert("Your profile as been updated successfully");
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await CaregiverService.update({
+        ...caretaker,
+        memberDetails: member,
+      });
+
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ message: response.msg }),
+      ]);
+    } catch (error) {
+      const err = error.response.data.msg;
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ type: "error", message: err }),
+      ]);
+    }
   };
 
   const handleLink = (path) => {
@@ -102,7 +167,7 @@ const CaretakerProfileUpdate = () => {
           Update your profile
         </h2>
         <div className="rounded-md w-[35rem] shadow-md p-10 pt-2 my-4 ring-[0.5px] ring-[rgba(0,0,0,0.2) bg-accent">
-          <form onSubmit={submitHandler}>
+          <form onSubmit={submitHandler} id="updateProfileForm">
             <div className="mt-8 max-w-md grid grid-cols-1 gap-6">
               <h2 className="font-bold text-xl text-primary pb-2 border-b-4 border-primary w-[30rem]">
                 Caretaker's Details
@@ -112,7 +177,7 @@ const CaretakerProfileUpdate = () => {
                 <input
                   type="text"
                   name="firstName"
-                  className="w-[30rem] input"
+                  className="w-[30rem] input text-black"
                   placeholder="First Name"
                   value={caretaker.firstName}
                   onChange={inputCaretakerChangeHandler}
@@ -124,7 +189,7 @@ const CaretakerProfileUpdate = () => {
                 <input
                   type="text"
                   name="lastName"
-                  className="w-[30rem] input"
+                  className="w-[30rem] input text-black"
                   placeholder="Last Name"
                   value={caretaker.lastName}
                   onChange={inputCaretakerChangeHandler}
@@ -136,7 +201,7 @@ const CaretakerProfileUpdate = () => {
                 <input
                   type="email"
                   name="emailAddress"
-                  className="w-[30rem] input"
+                  className="w-[30rem] input text-black"
                   placeholder="Email"
                   value={caretaker.emailAddress}
                   onChange={inputChangeHandler}
@@ -147,10 +212,10 @@ const CaretakerProfileUpdate = () => {
                 <label className="mr-4">Your Full Address</label>
                 <input
                   type="text"
-                  name="userAddress"
-                  className="w-[30rem] input"
+                  name="address"
+                  className="w-[30rem] input text-black"
                   placeholder="Address:"
-                  value={caretaker.fullAddress}
+                  value={caretaker.address}
                   onChange={inputCaretakerChangeHandler}
                   required
                 />
@@ -160,7 +225,7 @@ const CaretakerProfileUpdate = () => {
                 <input
                   type="text"
                   name="contactNumber"
-                  className="w-[30rem] input"
+                  className="w-[30rem] input text-black"
                   placeholder="Contact"
                   value={caretaker.contactNumber}
                   onChange={inputCaretakerChangeHandler}
@@ -198,18 +263,6 @@ const CaretakerProfileUpdate = () => {
               hover:file:bg-primary-focus"
                 />
               </div>
-              <div className="flex flex-col">
-                <label className="mr-4">Yours Password</label>
-                <input
-                  type="password"
-                  name="userPassword"
-                  className="w-[30rem] input"
-                  placeholder="Password"
-                  value={caretaker.password}
-                  onChange={inputCaretakerChangeHandler}
-                  required
-                />
-              </div>
             </div>
             <div className="mt-12 max-w-md grid grid-cols-1 gap-6">
               <h2 className="font-bold text-xl text-primary pb-2 border-b-4 border-primary w-[30rem]">
@@ -220,7 +273,7 @@ const CaretakerProfileUpdate = () => {
                 <input
                   type="text"
                   name="firstName"
-                  className="w-[30rem] input"
+                  className="w-[30rem] input text-black"
                   placeholder="First Name"
                   value={member.firstName}
                   onChange={inputChangeHandler}
@@ -232,7 +285,7 @@ const CaretakerProfileUpdate = () => {
                 <input
                   type="text"
                   name="lastName"
-                  className="w-[30rem] input"
+                  className="w-[30rem] input text-black"
                   placeholder="Last Name"
                   value={member.lastName}
                   onChange={inputChangeHandler}
@@ -256,7 +309,7 @@ const CaretakerProfileUpdate = () => {
                 <input
                   type="email"
                   name="emailAddress"
-                  className="w-[30rem] input"
+                  className="w-[30rem] input text-black"
                   placeholder="Email"
                   value={member.emailAddress}
                   onChange={inputChangeHandler}
@@ -267,10 +320,10 @@ const CaretakerProfileUpdate = () => {
                 <label className="mr-4">Member's Full Address</label>
                 <input
                   type="text"
-                  name="userAddress"
-                  className="w-[30rem] input"
+                  name="address"
+                  className="w-[30rem] input text-black"
                   placeholder="Address:"
-                  value={member.fullAddress}
+                  value={member.address}
                   onChange={inputChangeHandler}
                   required
                 />
@@ -280,7 +333,7 @@ const CaretakerProfileUpdate = () => {
                 <input
                   type="text"
                   name="contactNumber"
-                  className="w-[30rem] input"
+                  className="w-[30rem] input text-black"
                   placeholder="Contact"
                   value={member.contactNumber}
                   onChange={inputChangeHandler}
@@ -393,7 +446,7 @@ const CaretakerProfileUpdate = () => {
                       <input
                         type="text"
                         name="foodAllergies"
-                        className="w-[30rem] input"
+                        className="w-[30rem] input text-black"
                         value={member.foodAllergies}
                         onChange={inputChangeHandler}
                         placeholder="Please specify your food allergies"
@@ -402,44 +455,7 @@ const CaretakerProfileUpdate = () => {
                   )}
                 </div>
               </div>
-              <div className="flex flex-col">
-                <label className="mr-4 mb-2">Medical History Document</label>
-                <input
-                  type="file"
-                  name="file"
-                  className="file:py-2 file:px-4 file:rounded-full file:border-0 file:text-md file:font-semibold
-              file:bg-primary file:text-white
-              hover:file:bg-primary-focus"
-                />
-              </div>
-              <div className="flex flex-col">
-                <label className="mr-4">Member's Password</label>
-                <input
-                  type="password"
-                  name="userPassword"
-                  className="w-[30rem] input"
-                  placeholder="Password"
-                  value={member.password}
-                  onChange={inputChangeHandler}
-                  required
-                />
-              </div>
-              <div>
-                <label className="mr-4 flex items-center">
-                  <input
-                    type="checkbox"
-                    className="mr-2 checkbox-secondary"
-                    required
-                  />
-                  By signing up, you agree to our
-                  <a
-                    onClick={() => handleLink("/privacyPolicy")}
-                    className="link link-primary ml-1"
-                  >
-                    Terms & Conditions
-                  </a>
-                </label>
-              </div>
+
               <div className="flex justify-center items-center">
                 <BackButton />
                 <button type="submit" className="btn ml-10 w-40 btn-primary">

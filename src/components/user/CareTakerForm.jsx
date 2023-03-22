@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ToastProps from "../generic/ToastProps";
 import CaregiverService from "../services/CaregiverService";
+import LocationService from "../services/LocationService";
 
-const CareTakerForm = () => {
+const CareTakerForm = (props) => {
+  const { setToasts } = props;
   const [restrictions, setRestrictions] = useState([]);
   const [allergies, setAllergies] = useState("");
 
@@ -11,8 +14,6 @@ const CareTakerForm = () => {
 
   const foodAllergyHandler = (event) => {
     const value = event.target.value;
-
-    console.log(value);
 
     setAllergies(value);
   };
@@ -70,28 +71,65 @@ const CareTakerForm = () => {
       password: e.target.password?.value,
     };
 
-    const response = await CaregiverService.signup({
-      firstName,
-      lastName,
-      emailAddress,
-      address,
-      contactNumber,
-      relationshipToMember,
-      password,
-      memberDetails,
-    });
+    try {
+      const response = await CaregiverService.signup({
+        firstName,
+        lastName,
+        emailAddress,
+        address,
+        contactNumber,
+        relationshipToMember,
+        password,
+        memberDetails,
+      });
 
-    console.log(response);
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ message: response.msg }),
+      ]);
+
+      navigate("/thankyou", {
+        state: {
+          title: "Thank you for signing up!",
+          data: { firstName, lastName, emailAddress },
+          type: "signup",
+        },
+      });
+    } catch (error) {
+      const err = error.response.data.msg;
+      setToasts((toasts) => [
+        ...toasts,
+        new ToastProps({ type: "error", message: err }),
+      ]);
+    }
   };
 
   const handleLink = (path) => {
     navigate(path);
   };
 
-  const handleGeoLocation = async () => {
-    const coords = await LocationService.getCoordinates();
+  const handleGeoLocation = async (e) => {
+    const addressInput = e.target.parentNode.children[0];
+    const button = e.target;
 
-    console.log(coords);
+    const successhandler = async (pos) => {
+      const { latitude, longitude } = pos.coords;
+
+      addressInput.value = "Fetching address...";
+      addressInput.disabled = true;
+      button.classList.add("loading");
+
+      const response = await LocationService.toAddress({
+        lat: latitude,
+        long: longitude,
+      });
+
+      addressInput.value = response[0].formatted;
+      addressInput.disabled = false;
+      button.classList.remove("loading");
+    };
+
+    LocationService.getCoordinates(successhandler);
   };
 
   return (
@@ -134,13 +172,37 @@ const CareTakerForm = () => {
             </div>
             <div className="flex flex-col">
               <label className="mr-4">Your Full Address</label>
-              <input
-                type="text"
-                name="cAddress"
-                className="w-[30rem] input text-black"
-                placeholder="Address:"
-                required
-              />
+              <div className="w-[30rem] flex justify-between items-center gap-2">
+                <input
+                  type="text"
+                  name="cAddress"
+                  className="w-[30rem] input text-black"
+                  placeholder="Address:"
+                  required
+                />
+                <button
+                  type="button"
+                  className="btn btn-square btn-primary"
+                  onClick={handleGeoLocation}
+                >
+                  <svg
+                    fill="currentColor"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="1.5em"
+                    height="1.5em"
+                    viewBox="0 0 395.71 395.71"
+                    className="pointer-events-none"
+                  >
+                    <path
+                      d="M197.849,0C122.131,0,60.531,61.609,60.531,137.329c0,72.887,124.591,243.177,129.896,250.388l4.951,6.738
+              c0.579,0.792,1.501,1.255,2.471,1.255c0.985,0,1.901-0.463,2.486-1.255l4.948-6.738c5.308-7.211,129.896-177.501,129.896-250.388
+              C335.179,61.609,273.569,0,197.849,0z M197.849,88.138c27.13,0,49.191,22.062,49.191,49.191c0,27.115-22.062,49.191-49.191,49.191
+              c-27.114,0-49.191-22.076-49.191-49.191C148.658,110.2,170.734,88.138,197.849,88.138z"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div className="flex flex-col">
               <label className="mr-4">Your Contact Number</label>
@@ -238,13 +300,37 @@ const CareTakerForm = () => {
             </div>
             <div className="flex flex-col">
               <label className="mr-4">Member's Full Address</label>
-              <input
-                type="text"
-                name="userAddress"
-                className="w-[30rem] input text-black"
-                placeholder="Address:"
-                required
-              />
+              <div className="w-[30rem] flex justify-between items-center gap-2">
+                <input
+                  type="text"
+                  name="userAddress"
+                  className="w-[30rem] input text-black"
+                  placeholder="Address:"
+                  required
+                />
+                <button
+                  type="button"
+                  className="btn btn-square btn-primary"
+                  onClick={handleGeoLocation}
+                >
+                  <svg
+                    fill="currentColor"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="1.5em"
+                    height="1.5em"
+                    viewBox="0 0 395.71 395.71"
+                    className="pointer-events-none"
+                  >
+                    <path
+                      d="M197.849,0C122.131,0,60.531,61.609,60.531,137.329c0,72.887,124.591,243.177,129.896,250.388l4.951,6.738
+              c0.579,0.792,1.501,1.255,2.471,1.255c0.985,0,1.901-0.463,2.486-1.255l4.948-6.738c5.308-7.211,129.896-177.501,129.896-250.388
+              C335.179,61.609,273.569,0,197.849,0z M197.849,88.138c27.13,0,49.191,22.062,49.191,49.191c0,27.115-22.062,49.191-49.191,49.191
+              c-27.114,0-49.191-22.076-49.191-49.191C148.658,110.2,170.734,88.138,197.849,88.138z"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div className="flex flex-col">
               <label className="mr-4">Member's Contact Number</label>

@@ -3,9 +3,10 @@ import MainLogo from "images/Logo.png";
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import UserService from "../services/UserService";
+import ToastProps from "./ToastProps";
 
 const Header = (props) => {
-  const { isLoggedIn, setIsLoggedIn, userDetails, userType } = props;
+  const { isLoggedIn, setIsLoggedIn, userDetails, userType, setToasts } = props;
   const [profileLink, setProfileLink] = useState("");
   const navigate = useNavigate();
 
@@ -35,8 +36,7 @@ const Header = (props) => {
     const response = await UserService.logout();
 
     setIsLoggedIn(false);
-
-    console.log(response);
+    setToasts((prev) => [...prev, new ToastProps({ message: response.msg })]);
 
     navigate("/userLogin");
   };
@@ -46,7 +46,7 @@ const Header = (props) => {
   };
 
   return (
-    <div className="navbar bg-base-100 shadow-xl rounded-md w-full font-sans sticky top-0 z-10">
+    <div className="navbar bg-base-100 shadow-xl rounded-md w-full font-sans sticky top-0 z-20">
       <div className="navbar-start ml-3 flex-1">
         <div className="dropdown">
           <label tabIndex={0} className="btn btn-ghost lg:hidden">
@@ -70,10 +70,10 @@ const Header = (props) => {
             className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
           >
             <li>
-              <a>Get Meals</a>
+              <a onClick={() => navigate("/userRegister")}>Get Meals</a>
             </li>
             <li>
-              <a>Nearby Partners</a>
+              <a onClick={() => navigate("/nearby")}>Nearby Partners</a>
             </li>
             <li tabIndex={0}>
               <a className="justify-between">
@@ -90,7 +90,9 @@ const Header = (props) => {
               </a>
               <ul className="p-2 bg-base-100 shadow menu menu-compact ring-[0.5px] ring-[rgba(0,0,0,0.2)]">
                 <li>
-                  <a>How to Volunteer?</a>
+                  <a onClick={() => navigate("/volunteerPromotion")}>
+                    How to Volunteer?
+                  </a>
                 </li>
                 <li>
                   <a>How to become a partner?</a>
@@ -98,10 +100,10 @@ const Header = (props) => {
               </ul>
             </li>
             <li>
-              <a>About Us</a>
+              <a onClick={() => navigate("/aboutUs")}>About Us</a>
             </li>
             <li>
-              <a>Contact Us</a>
+              <a onClick={() => navigate("/contactUs")}>Contact Us</a>
             </li>
           </ul>
         </div>
@@ -119,10 +121,10 @@ const Header = (props) => {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <a>Get Meals</a>
+            <a onClick={() => navigate("/userRegister")}>Get Meals</a>
           </li>
           <li>
-            <a>Nearby Partners</a>
+            <a onClick={() => navigate("/nearby")}>Nearby Partners</a>
           </li>
           <li tabIndex={0}>
             <a className="justify-between">
@@ -131,7 +133,9 @@ const Header = (props) => {
             </a>
             <ul className="p-2 bg-base-100 shadow menu menu-compact ring-[0.5px] ring-[rgba(0,0,0,0.2)]">
               <li>
-                <a>How to Volunteer?</a>
+                <a onClick={() => navigate("/volunteerPromotion")}>
+                  How to Volunteer?
+                </a>
               </li>
               <li>
                 <a>How to become a partner?</a>
@@ -139,16 +143,21 @@ const Header = (props) => {
             </ul>
           </li>
           <li>
-            <a>About Us</a>
+            <a onClick={() => navigate("/aboutUs")}>About Us</a>
           </li>
           <li>
-            <a>Contact Us</a>
+            <a onClick={() => navigate("/contactUs")}>Contact Us</a>
           </li>
         </ul>
       </div>
-      <div className="navbar-end mr-6">
+      <div className="navbar-end mr-6 max-w-[37rem]">
         <div className="mr-6">
-          <button className="btn btn-primary font-bold pt-1">Donate</button>
+          <button
+            className="btn btn-primary font-bold pt-1"
+            onClick={() => navigate("/donate")}
+          >
+            Donate
+          </button>
         </div>
         <div className={`${isLoggedIn ? "hidden" : ""}`}>
           <button
@@ -173,7 +182,7 @@ const Header = (props) => {
         </label>
         <ul
           tabIndex={0}
-          className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
+          className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box"
         >
           <li className="pointer-events-none rounded-xl px-4 py-1.5 mb-2 text-white bg-primary drop-shadow-sm">
             <span className="m-0 p-0">Logged in as:</span>
@@ -182,13 +191,14 @@ const Header = (props) => {
             </span>
           </li>
           <li>
-            <Link to={profileLink}>
-              <a className="justify-between">
-                {userType === "admin" ? "Admin dashboard" : "Profile"}
-              </a>
-            </Link>
+            <a
+              className="justify-between"
+              onClick={() => navigate(profileLink)}
+            >
+              {userType === "admin" ? "Admin dashboard" : "Profile"}
+            </a>
           </li>
-          <li onClick={handleLogout}>
+          <li>
             <a onClick={handleLogout}>Log out</a>
           </li>
         </ul>
